@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tabletop-lab"
+version = "0.0.1"
+description = "Cross-platform tabletop game description for multiplayer and multiagent playtesting"
+authors = [{ name = "Kevin Huang", email = "origamijr@sbcglobal.net" }]
+license = { file = "LICENSE" }
+readme = "README.md"
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: JavaScript",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "lupa>=2.6",
+]
+
+[project.scripts]
+raspppy = "tabletop-lab.main:main"
+
+[project.urls]
+"Homepage" = "https://github.com/Origamijr/tabletop-lab"
+"Bug Tracker" = "https://github.com/Origamijr/tabletop-lab/issues"

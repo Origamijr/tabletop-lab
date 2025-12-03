@@ -1,0 +1,11 @@
+venv*/
+__pycache__/
+models/
+*.ipynb
+node_modules/
+build/
+dist/
+*.exe
+*.spec
+externals/*
+!externals/redirect.md
