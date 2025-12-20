@@ -1,4 +1,6 @@
 venv*/
+test*
+!test/
 __pycache__/
 models/
 *.ipynb

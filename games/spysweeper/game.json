@@ -1,16 +1,23 @@
 {
     "gamename": "Cribbage",
-    "collections": {
-        "poker": "poker.json"
+    "assets": {
+        "poker": "poker.csv"
+    },
+    "scripts": {
+
+    },
+    "gui": {
+        "rows": 3,
+        "cols": 5
     },
     "zones": {
         "deck": {
             "type": "stack"
         },
-        "player1_hand": {
+        "hand_p1": {
             "type": "spread"
         },
-        "player2_hand": {
+        "hand_p2": {
             "type": "spread"
         },
         "play": {
@@ -22,12 +29,17 @@
     },
     "variables": {
         "dealer": 1,
-        "player1_score": 0,
-        "player2_score": 0
+        "score_p1": 0,
+        "score_p2": 0
     },
+    "reset": [
+        "deck.load_collection"
+    ],
     "gamestates": {
         "deal": {
-            "on-enter": []
+            "on_enter": [
+                ""
+            ]
         }
     }
 }

@@ -1,0 +1,54 @@
+{
+    "gamename": "Cribbage",
+    "gui": {
+        "rows": 3,
+        "cols": 5
+    },
+    "zones": {
+        "deck": {
+            "type": "stack",
+            "location": [[1,0]]
+        },
+        "hand_p1": {
+            "type": "spread",
+            "location": [[0,1],[0,3]]
+        },
+        "hand_p2": {
+            "type": "spread",
+            "location": [[2,1],[2,3]]
+        },
+        "play": {
+            "type": "spread",
+            "location": [[1,1],[1,3]]
+        },
+        "crib": {
+            "type": "stack",
+            "location": [[1,4]]
+        }
+    },
+    "variables": {
+        "dealer": 1,
+        "score_p1": 0,
+        "score_p2": 0,
+        "total": 0
+    },
+    "init": [
+        "deck:load_collection(Card, poker, {}):shuffle()"
+    ],
+    "gamestates": {
+        "deal": {
+            "on_enter": [
+                "deck.deal(hand_p1, 6)",
+                "deck.deal(hand_p2, 6)"
+            ]
+        },
+        "crib": {
+            "actions": {
+
+            },
+            "on_action": [
+
+            ]
+        }
+    }
+}
