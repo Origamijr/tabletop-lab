@@ -11,3 +11,4 @@ dist/
 *.spec
 externals/*
 !externals/redirect.md
+test_*/

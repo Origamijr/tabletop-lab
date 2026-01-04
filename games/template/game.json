@@ -1,5 +1,6 @@
 {
     "gamename": "Template",
+    "players": 2,
     "gui": {
         "rows": 2,
         "cols": 2
@@ -7,31 +8,34 @@
     "zones": {
         "deck": {
             "type": "stack",
+            "description": "location designates position in gui grid, and offset desgnates the offset of adjacent objects in collection. gui only",
             "location": [[0,0]],
-            "offset": [-0.01,-0.005] // display offset as fraction of object
+            "offset": [-0.01,-0.005]
         }
     },
     "variables": {
-        "var": 0 // set on init
+        "var": "-- set on init"
     },
-    "init": [ // scripts to call on initialization
+    "init": [ 
+        "-- scripts to call on initialization",
         "self.zones.deck:load_collection(Card, self.collections.poker, {}):shuffle()"
     ],
     "gamestates": {
         "deal": {
             "on_enter": [
-                // scripts to run on entering state
+                "-- scripts to run on entering state"
             ],
             "actions": {
                 "action 1": {
                     "condition": [
-                        // function that must evaluate to true
+                        "-- function that must evaluate to true",
+                        "return #self.zones.deck > 0"
                     ]
                     
                 }
             },
             "on-action": [
-                // scripts to call after each action
+                "-- scripts to call after each action"
             ]
         },
         "end": {
