@@ -30,8 +30,17 @@
                     "condition": [
                         "-- function that must evaluate to true",
                         "return #self.zones.deck > 0"
+                    ],
+                    "targets": {
+                        "name": "target",
+                        "candidates": ["-- list or zone to find valid targets"],
+                        "condition": "-- function that evaluates to boolean",
+                        "min_targets": "optional, default 1",
+                        "max_targets": "optional, default min_targets"
+                    },
+                    "execution": [
+                        "-- scripts to be executed"
                     ]
-                    
                 }
             },
             "on-action": [
