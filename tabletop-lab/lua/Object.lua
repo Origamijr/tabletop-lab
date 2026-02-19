@@ -1,17 +1,26 @@
 local Object = {}
 
+-- module-level unique id counter
+local __next_object_id = 0
+
 function Object:new(o)
     o = o or {}
     setmetatable(o, self)
     self.__index = self
 
-    o._zones = {}
+    -- unique id per instance
+    __next_object_id = __next_object_id + 1
+    o.id = __next_object_id
+
+    -- history of zones this object has been in; index 1 is current
+    o._zones = o._zones or {}
+    o._actions = o._actions or {}
 
     return o
 end
 
 function Object:set_zone(zone)
-    local current = self.zones[1]
+    local current = self._zones and self._zones[1]
     if current and current.objs then
         for i = #current.objs, 1, -1 do
             if current.objs[i] == self then

@@ -1,5 +1,5 @@
 {
-    "gamename": "Template",
+    "gamename": "Hokm",
     "players": 2,
     "gui": {
         "rows": 2,
@@ -18,7 +18,7 @@
     },
     "init": [ 
         "-- scripts to call on initialization",
-        "self.zones.deck:load_collection('collection.csv', Card, {}):shuffle()"
+        "self.zones.deck:load_collection(Card, self.collections.poker, {}):shuffle()"
     ],
     "gamestates": {
         "deal": {

@@ -1,0 +1,120 @@
+{
+    "gamename": "Cuttle",
+    "players": 2,
+    "zones": {
+        "deck": {
+            "quantity": 1
+        },
+        "scrap": {
+            "quantity": 1
+        },
+        "hand": {
+            "quantity": 2
+        },
+        "point": {
+            "quantity": 2
+        },
+        "perms": {
+            "quantity": 2
+        }
+    },
+    "variables": {
+    },
+    "init": [
+    ],
+    "gamestates": {
+        "deal": {
+            "on_enter": [
+                "-- scripts to run on entering state"
+            ],
+            "transitions": [
+                ""
+            ]
+        }
+    },
+    "actions": {
+        "draw": {
+            "conditions": [
+                "game.state == 'action'",
+                "game.current_player == player.id",
+                "#game.zones.deck > 0",
+                "#game.zones.hand[player.id] < 8"
+            ],
+            "execution": [
+                "-- scripts to be executed"
+            ]
+        },
+        "points": {
+            "conditions": [
+                "game.state == 'action'",
+                "game.current_player == player.id",
+                "#game.zones.deck > 0",
+                "#game.zones.hand[player.id] < 8"
+            ],
+            "targets": {
+                "name": "target",
+                "candidates": ["-- list or zone to find valid targets"],
+                "condition": "-- function that evaluates to boolean",
+                "min_targets": "optional, default 1",
+                "max_targets": "optional, default min_targets"
+            },
+            "execution": [
+                "-- scripts to be executed"
+            ]
+        },
+        "one-off": {
+            "conditions": [
+                "game.state == 'action'",
+                "game.current_player == player.id",
+                "#game.zones.deck > 0",
+                "#game.zones.hand[player.id] < 8"
+            ],
+            "targets": {
+                "name": "target",
+                "candidates": ["-- list or zone to find valid targets"],
+                "condition": "-- function that evaluates to boolean",
+                "min_targets": "optional, default 1",
+                "max_targets": "optional, default min_targets"
+            },
+            "execution": [
+                "-- scripts to be executed"
+            ]
+        },
+        "royal": {
+            "conditions": [
+                "game.state == 'action'",
+                "game.current_player == player.id",
+                "#game.zones.deck > 0",
+                "#game.zones.hand[player.id] < 8"
+            ],
+            "targets": {
+                "name": "target",
+                "candidates": ["-- list or zone to find valid targets"],
+                "condition": "-- function that evaluates to boolean",
+                "min_targets": "optional, default 1",
+                "max_targets": "optional, default min_targets"
+            },
+            "execution": [
+                "-- scripts to be executed"
+            ]
+        },
+        "scuttle": {
+            "conditions": [
+                "game.state == 'action'",
+                "game.current_player == player.id",
+                "#game.zones.deck > 0",
+                "#game.zones.hand[player.id] < 8"
+            ],
+            "targets": {
+                "name": "target",
+                "candidates": ["-- list or zone to find valid targets"],
+                "condition": "-- function that evaluates to boolean",
+                "min_targets": "optional, default 1",
+                "max_targets": "optional, default min_targets"
+            },
+            "execution": [
+                "-- scripts to be executed"
+            ]
+        }
+    }
+}

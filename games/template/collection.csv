@@ -1,4 +1,4 @@
-_id,_quantity,suit,value
+id,_quantity,suit,value
 1,1,H,A
 2,1,H,2
 3,1,H,3
