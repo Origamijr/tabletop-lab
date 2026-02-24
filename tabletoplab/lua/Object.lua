@@ -8,13 +8,13 @@ function Object:new(o)
     setmetatable(o, self)
     self.__index = self
 
-    -- unique id per instance
     __next_object_id = __next_object_id + 1
-    o.id = __next_object_id
+    o._uid = __next_object_id
 
     -- history of zones this object has been in; index 1 is current
     o._zones = o._zones or {}
     o._actions = o._actions or {}
+    o.game = nil -- reference to parent Gamestate, set by Zone:load_collection()
 
     return o
 end
@@ -38,6 +38,10 @@ function Object:set_zone(zone)
     table.insert(self._zones, 1, zone)
 
     return self
+end
+
+function Object:register_action(name, action)
+    self._actions[name] = action
 end
 
 return Object

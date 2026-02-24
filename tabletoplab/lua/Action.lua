@@ -4,6 +4,7 @@ function Action:new(o)
     o = o or {}
     setmetatable(o, self)
     self.__index = self
+    o.player = nil -- TODO This should be populated with the player taking the action before check_conditions, get_valid_targets, and execute occur
     o._conditions = {}
     o._targets = {}
     o._executions = {}
@@ -15,13 +16,13 @@ function Action:add_condition(cond)
     return self
 end
 
-function Action:add_target(name, candidates, condition, min_targets, max_targets)
+function Action:add_target(name, candidates, conditions, min_targets, max_targets)
     min_targets = min_targets or 1
     max_targets = max_targets or min_targets
     local spec = {
         name = name,
         candidates = candidates,
-        condition = condition,
+        conditions = conditions,
         min = min_targets,
         max = max_targets
     }

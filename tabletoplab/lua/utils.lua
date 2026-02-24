@@ -4,7 +4,7 @@ local utils = {}
 -- Posted by islet8, modified by community. See post 'Timeline' for change history
 -- Retrieved 2026-01-01, License - CC BY-SA 3.0
 
-local function deepcopy(o, seen)
+utils.deepcopy = function(o, seen)
   seen = seen or {}
   if o == nil then return nil end
   if seen[o] then return seen[o] end
@@ -24,6 +24,5 @@ local function deepcopy(o, seen)
   return no
 end
 
-utils.deepcopy = deepcopy
 
 return utils

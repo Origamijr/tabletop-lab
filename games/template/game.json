@@ -1,55 +1,56 @@
 {
     "gamename": "Template",
     "players": 2,
-    "gui": {
-        "rows": 2,
-        "cols": 2
-    },
     "zones": {
-        "deck": {
-            "type": "stack",
-            "description": "location designates position in gui grid, and offset desgnates the offset of adjacent objects in collection. gui only",
-            "location": [[0,0]],
-            "offset": [-0.01,-0.005]
-        }
+        "deck": {"quantity": 1},
+        "hand": {"quantity": 2}
     },
     "variables": {
-        "var": "-- set on init"
+        "var": "-- set on init",
+        "current_player": 1
     },
     "init": [ 
         "-- scripts to call on initialization",
-        "self.zones.deck:load_collection('collection.csv', Card, {}):shuffle()"
+        "zones.deck:load_collection('collection', Card, {}):shuffle()"
     ],
     "gamestates": {
         "deal": {
+            "initial": true,
             "on_enter": [
-                "-- scripts to run on entering state"
+                "-- scripts to run on entering state",
+                "zones.deck:deal(zones.hand[1], 5)",
+                "return 'this_wont_happen'"
             ],
-            "actions": {
-                "action 1": {
-                    "condition": [
-                        "-- function that must evaluate to true",
-                        "return #self.zones.deck > 0"
-                    ],
-                    "targets": {
-                        "name": "target",
-                        "candidates": ["-- list or zone to find valid targets"],
-                        "condition": "-- function that evaluates to boolean",
-                        "min_targets": "optional, default 1",
-                        "max_targets": "optional, default min_targets"
-                    },
-                    "execution": [
-                        "-- scripts to be executed"
-                    ]
-                }
-            },
-            "on-action": [
-                "-- scripts to call after each action"
+            "transitions": [
+                {"conditions": ["#zones.hand[1]<5","false"], "next_state": ["this_wont_happen","nondeterministic_transition"]},
+                {"conditions": ["signaled('sig')"], "next_state": "end"},
+                {"conditions": ["signaled('this_wont_happen')"], "next_state": "this_wont_happen"},
+                {"conditions": ["true"], "next_state": "default_but_this_wont_happen"}
             ]
         },
         "end": {
             "on_enter": [
-
+                "end_game({'winner': 1})"
+            ]
+        }
+    },
+    "actions": {
+        "action_1": {
+            "condition": [
+                "true -- expressions that must evaluate to true",
+                "state.deal -- state is a dictionary that maps state to a boolean indicating if it's active",
+                "player = current_player -- player (possibly) taking the action can be accessed via 'player'"
+            ],
+            "targets": {
+                "name": "t",
+                "candidates": ["zones.hand[player]"],
+                "condition": "function(c) return c.value != 'A'",
+                "min_targets": 1,
+                "max_targets": 2
+            },
+            "execution": [
+                "t:send_to(deck)",
+                "return 'sig'"
             ]
         }
     }

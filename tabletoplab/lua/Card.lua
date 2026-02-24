@@ -1,4 +1,4 @@
-local Object = require('tabletop-lab.lua.Object')  -- use consistent module path
+local Object = require('tabletoplab.lua.Object')  -- use consistent module path
 local Card = setmetatable({}, { __index = Object })
 Card.__index = Card
 

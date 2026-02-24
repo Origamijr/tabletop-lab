@@ -1,55 +1,57 @@
 {
     "gamename": "Hokm",
     "players": 2,
-    "gui": {
-        "rows": 2,
-        "cols": 2
-    },
     "zones": {
-        "deck": {
-            "type": "stack",
-            "description": "location designates position in gui grid, and offset desgnates the offset of adjacent objects in collection. gui only",
-            "location": [[0,0]],
-            "offset": [-0.01,-0.005]
-        }
+        "deck": {},
+        "discard": {},
+        "hand": {"quantity": 2},
+        "check": {"quantity": 2}
     },
     "variables": {
-        "var": "-- set on init"
     },
-    "init": [ 
-        "-- scripts to call on initialization",
-        "self.zones.deck:load_collection(Card, self.collections.poker, {}):shuffle()"
+    "init": [
+        "_zones.deck:load_collection('cards', Card):shuffle()"
     ],
     "gamestates": {
         "deal": {
+            "initial": true,
+            "on_enter": [
+                "_zones.deck:deal(_zones.hand[1], 5)",
+                "_zones.deck:deal(_zones.hand[2], 5)",
+                "wait_for_action('hakem_discard')",
+                "wait_for_action('dealer_discard')"
+            ],
+            "transitions": {
+                "_": ["draft"]
+            }
+        },
+        "draft": {
             "on_enter": [
                 "-- scripts to run on entering state"
             ],
-            "actions": {
-                "action 1": {
-                    "condition": [
-                        "-- function that must evaluate to true",
-                        "return #self.zones.deck > 0"
-                    ],
-                    "targets": {
-                        "name": "target",
-                        "candidates": ["-- list or zone to find valid targets"],
-                        "condition": "-- function that evaluates to boolean",
-                        "min_targets": "optional, default 1",
-                        "max_targets": "optional, default min_targets"
-                    },
-                    "execution": [
-                        "-- scripts to be executed"
-                    ]
-                }
-            },
-            "on-action": [
-                "-- scripts to call after each action"
-            ]
+            "transition": {
+                "_": 
+            }
         },
         "end": {
             "on_enter": [
 
+            ]
+        }
+    },
+    "actions": {
+        "hakem_discard": {
+            "condition": [
+                "player == 1",
+                "states.deal"
+            ],
+            "targets": {
+                "name": "target",
+                "candidates": ["hand[1]"],
+                "min_targets": 3
+            },
+            "execution": [
+                "for _,c in ipairs(target) do c:send_to(_zones.discard) end"
             ]
         }
     }

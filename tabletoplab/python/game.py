@@ -4,16 +4,17 @@ import json
 import glob
 import os
 
-class TTLEnvironment():
+class TTLGame():
     def __init__(self, path):
         self.path = path
-        self.lua = LuaRuntime(True)
+        self.lua = LuaRuntime(unpack_returned_tuples=True)
 
         # Recursively find all CSV files and load them into COLLECTIONS (Lua global)
         collections = {}
         for csv_file in glob.glob(f"{path}/**/*.csv", recursive=True):
             rel_path = os.path.relpath(csv_file, path).replace("\\", "/")
             key = os.path.splitext(rel_path)[0]
+            print(csv_file)
             collections[key] = self.parse_csv_sanitized(csv_file)
         self.lua.globals().COLLECTIONS = collections
 
@@ -47,7 +48,7 @@ class TTLEnvironment():
         # Require all lua scripts in the game path, except those in dynamic_scripts directories
         for lua_file in glob.glob(f"{game_path_abs}/**/*.lua", recursive=True):
             # Skip files in dynamic_scripts directories
-            if '/lazy/' in lua_file.replace("\\", "/") or lua_file.replace("\\", "/").endswith('/dynamic_scripts.lua'):
+            if '/object_scripts/' in lua_file.replace("\\", "/") or lua_file.replace("\\", "/").endswith('/dynamic_scripts.lua'):
                 continue
             rel = os.path.relpath(lua_file, game_path_abs).replace("\\", "/")
             mod_name = os.path.splitext(rel)[0].replace('/', '.')
@@ -56,10 +57,38 @@ class TTLEnvironment():
             except Exception:
                 pass
 
+        # Expose a function to lua that loads lazy scripts from the lazy directory
+        # Use a cache to avoid redundant file reads for the same script
+        self.lazy_script_cache = {}
+        def load_object_script(script_path):
+            """Load a lazy script from the lazy directory. Path should not include .lua extension."""
+            if script_path in self.lazy_script_cache:
+                return self.lazy_script_cache[script_path]
+            
+            full_path = os.path.join(game_path_abs, 'object_scripts', script_path + '.lua')
+            try:
+                with open(full_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    self.lazy_script_cache[script_path] = content
+                    return content
+            except (IOError, OSError) as e:
+                raise Exception(f"Failed to load object script '{script_path}': {e}")
+        self.lua.globals().LOAD_OBJECT_SCRIPT = load_object_script
+        
+        self.logs = []
+        def log(log_event):
+            self.logs.append(log_event)
+        self.lua.globals().LOG = log
+
+        # Initialize a Gamestate object with self.game_config as the parameter
+        self.lua.globals().Gamestate = self.lua.globals()['require']('tabletoplab.lua.Gamestate')
+        self.gamestate = self.lua.globals().Gamestate(self.game_config)
+        #self.lua.globals().GAMESTATE = self.gamestate
+
     def initialize(self):
         self.env = self.lua.eval
 
-    def parse_csv_sanitized(path):
+    def parse_csv_sanitized(self, path):
         with open(path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             reader.fieldnames = [header.strip() for header in reader.fieldnames]

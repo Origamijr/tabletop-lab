@@ -1,0 +1,38 @@
+id,_quantity,number,elite,spy_effect,query_effect
+0,0,0,0,lorem,ipsum
+1,2,1,0,Helper is a spy,Pick a number. Reveal if it is a spy.
+2,2,1,0,Helper is a liar,Pick a number. Reveal if it is a spy.
+3,1,1,1,Helper is a spy,"Pick a number. If I don't lie and number is a spy, opponent must reveal it in their spy grid."
+4,1,1,1,Helper is a liar,"Pick a number. If I don't lie and number is a spy, opponent must reveal it in their spy grid."
+5,2,2,0,Helper is a spy,Pick 2 numbers. Reveal if at least one is a spy.
+6,2,2,0,Helper is a liar,Pick 2 numbers. Reveal if at least one is a spy.
+7,1,2,1,"Helper is a both a spy and a liar. If opponent accuses another number while I am concealed, reveal me and end opponent's turn.",Pick 2 numbers. Reveal if at least one is a spy.
+8,1,2,1,"Helper is a neither a spy or a liar. If helper is accused, win the game.",Pick 2 numbers. Reveal if at least one is a spy.
+9,2,3,0,Helper is a spy,"Reveal a number that is not a spy."
+10,2,3,0,Helper is a liar,"Reveal a number that is not a spy."
+11,1,3,1,Helper is a spy,"Look at the top 3 cards of a deck and place them on the top/bottom in any order. Reveal a number that is not a spy."
+12,1,3,1,Helper is a liar,"Look at the top 3 cards of a deck and place them on the top/bottom in any order. Reveal a number that is not a spy."
+13,2,4,0,Helper is a spy,Reveal number of spies in row.
+14,2,4,0,Helper is a liar,Reveal number of spies in row
+15,1,4,1,"Helper is a spy. For your turn, if my helper is concealed, you may reveal me and swap me with my helper (I am now the helper, and helper is now both spy and liar). Go again",Reveal number of spies in row.
+16,1,4,1,"Helper is a liar. For your turn, if my helper is concealed, you may reveal me and swap me with my helper (I am now the helper, and helper is now both spy and liar). Go again",Reveal number of spies in row.
+17,2,5,0,Helper is a spy,Reveal number of adjacent spies.
+18,2,5,0,Helper is a liar,Reveal number of adjacent spies.
+19,1,5,1,Helper is a spy,
+20,1,5,1,Helper is a liar,
+21,2,6,0,"Helper is a spy. For your turn, if my helper is concealed, you may reveal me and swap me with my helper (I am now the helper, and helper is now both spy and liar). Go again",Reveal number of spies in column.
+22,2,6,0,"Helper is a liar. For your turn, if my helper is concealed, you may reveal me and swap me with my helper (I am now the helper, and helper is now both spy and liar). Go again",Reveal number of spies in column.
+23,1,6,1,Helper is a spy,Reveal number of spies in column.
+24,1,6,1,Helper is a liar,Reveal number of spies in column.
+25,2,7,0,Helper is a spy,
+26,2,7,0,Helper is a liar,
+27,1,7,1,Helper is a spy,
+28,1,7,1,Helper is a liar,
+29,2,8,0,Helper is a spy,"Reveal if I am lying or a spy (yes or no,cannot lie)"
+30,2,8,0,Helper is a liar,"Reveal if I am lying or a spy (yes or no,cannot lie)"
+31,1,8,1,"Helper is a both a spy and a liar. If opponent accuses another number while I am concealed, reveal me and end opponent's turn.","Reveal if I am lying or a spy (yes or no,cannot lie)"
+32,1,8,1,"Helper is a neither a spy or a liar. If helper is accused, win the game.","Reveal if I am lying or a spy (yes or no,cannot lie)"
+33,2,9,0,Helper is a spy,
+34,2,9,0,Helper is a liar,
+35,1,9,1,Helper is a spy,
+36,1,9,1,Helper is a liar,
