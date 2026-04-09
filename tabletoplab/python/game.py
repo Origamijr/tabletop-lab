@@ -10,13 +10,18 @@ class TTLGame():
         self.lua = LuaRuntime(unpack_returned_tuples=True)
 
         # Recursively find all CSV files and load them into COLLECTIONS (Lua global)
-        collections = {}
+        collections_dict = {}
         for csv_file in glob.glob(f"{path}/**/*.csv", recursive=True):
             rel_path = os.path.relpath(csv_file, path).replace("\\", "/")
             key = os.path.splitext(rel_path)[0]
             print(csv_file)
-            collections[key] = self.parse_csv_sanitized(csv_file)
-        self.lua.globals().COLLECTIONS = collections
+            csv_data = self.parse_csv_sanitized(csv_file)
+            # Convert each row (dict) to a Lua table
+            lua_rows = []
+            for row in csv_data:
+                lua_rows.append(self.lua.table_from(row))
+            collections_dict[key] = self.lua.table_from(lua_rows)
+        self.lua.globals().COLLECTIONS = self.lua.table_from(collections_dict)
 
         # Load game.json from the given path
         game_json_path = os.path.join(path, 'game.json')
@@ -40,8 +45,9 @@ class TTLGame():
             if rel.endswith('init.lua'):
                 continue
             mod_name = os.path.splitext(rel)[0].replace('/', '.')
+            var_name = os.path.splitext(os.path.basename(lua_file))[0]
             try:
-                self.lua.execute(f'pcall(require, "{mod_name}")')
+                self.lua.execute(f'pcall(function() {var_name} = require("{mod_name}") end)')
             except Exception:
                 pass
 
@@ -52,8 +58,9 @@ class TTLGame():
                 continue
             rel = os.path.relpath(lua_file, game_path_abs).replace("\\", "/")
             mod_name = os.path.splitext(rel)[0].replace('/', '.')
+            var_name = os.path.splitext(os.path.basename(lua_file))[0]
             try:
-                self.lua.execute(f'pcall(require, "{mod_name}")')
+                self.lua.execute(f'pcall(function() {var_name} = require("{mod_name}") end)')
             except Exception:
                 pass
 
@@ -77,13 +84,17 @@ class TTLGame():
         
         self.logs = []
         def log(log_event):
-            self.logs.append(log_event)
+            try:
+                message, data = log_event['message'], log_event['data']
+                self.logs.append((message, dict(data)))
+                print(f"LOG: {message}")
+            except Exception as e:
+                print(f"LOG ERROR: {e}")
         self.lua.globals().LOG = log
 
-        # Initialize a Gamestate object with self.game_config as the parameter
-        self.lua.globals().Gamestate = self.lua.globals()['require']('tabletoplab.lua.Gamestate')
-        self.gamestate = self.lua.globals().Gamestate(self.game_config)
-        #self.lua.globals().GAMESTATE = self.gamestate
+        # Get the singleton Game instance and initialize it with config
+        self.game = self.lua.globals().GAME
+        self.lua.globals().GAME['initialize'](self.game, self.lua.table_from(self.game_config, recursive=True))
 
     def initialize(self):
         self.env = self.lua.eval

@@ -1,1 +1,1 @@
-from .python.game import TTLEnvironment
+from .python.game import TTLGame

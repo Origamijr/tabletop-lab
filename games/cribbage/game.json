@@ -1,53 +1,110 @@
 {
     "gamename": "Cribbage",
-    "gui": {
-        "rows": 3,
-        "cols": 5
-    },
+    "players": 2,
     "zones": {
-        "deck": {
-            "type": "stack",
-            "location": [[1,0]]
+        "deck": {},
+        "hand": {
+            "quantity": 2
         },
-        "hand_p1": {
-            "type": "spread",
-            "location": [[0,1],[0,3]]
-        },
-        "hand_p2": {
-            "type": "spread",
-            "location": [[2,1],[2,3]]
-        },
-        "play": {
-            "type": "spread",
-            "location": [[1,1],[1,3]]
-        },
-        "crib": {
-            "type": "stack",
-            "location": [[1,4]]
-        }
+        "play": {},
+        "crib": {},
+        "starter": {}
     },
     "variables": {
         "dealer": 1,
-        "score_p1": 0,
-        "score_p2": 0,
-        "total": 0
+        "current_player": 2,
+        "score": [0, 0],
+        "peg_total": 0
     },
     "init": [
-        "deck:load_collection(Card, poker, {}):shuffle()"
+        "load_collection(zones.deck, 'poker', Card)",
+        "zones.deck:shuffle()"
     ],
     "gamestates": {
         "deal": {
+            "initial": true,
             "on_enter": [
-                "deck.deal(hand_p1, 6)",
-                "deck.deal(hand_p2, 6)"
+                "current_player = (dealer == 1) and 2 or 1",
+                "zones.deck:deal(zones.hand[1], 6)",
+                "zones.deck:deal(zones.hand[2], 6)",
+                "zones.deck:deal(zones.starter, 1)"
+            ],
+            "transitions": [
+                {"next_state": "crib_phase"}
             ]
         },
-        "crib": {
-            "actions": {
-
-            },
-            "on_action": [
-
+        "crib_phase": {
+            "on_enter": [
+                "current_player = (dealer == 1) and 2 or 1"
+            ],
+            "transitions": [
+                {"conditions": ["#zones.crib.objs == 4"], "next_state": "play_phase"}
+            ]
+        },
+        "play_phase": {
+            "on_enter": [
+                "peg_total = 0",
+                "current_player = (dealer == 1) and 2 or 1"
+            ],
+            "transitions": [
+                {"conditions": ["#zones.hand[1].objs == 0 and #zones.hand[2].objs == 0"], "next_state": "scoring_phase"}
+            ]
+        },
+        "scoring_phase": {
+            "on_enter": [
+                "score[1] = score[1] + score(zones.starter.objs[1], zones.hand[1].objs)",
+                "score[2] = score[2] + score(zones.starter.objs[1], zones.hand[2].objs)",
+                "score[dealer] = score[dealer] + score(zones.starter.objs[1], zones.crib.objs)"
+            ],
+            "transitions": [
+                {"conditions": ["score[1] >= 121 or score[2] >= 121"], "next_state": "game_over"}
+            ]
+        },
+        "game_over": {
+            "on_enter": [
+                "-- Game completed, winner is whoever reached 121 first"
+            ],
+            "transitions": []
+        }
+    },
+    "actions": {
+        "discard_to_crib": {
+            "conditions": [
+                "state.crib_phase == true",
+                "current_player == player",
+                "#zones.hand[player].objs == 6"
+            ],
+            "targets": [
+                {
+                    "name": "card",
+                    "candidates": "zones.hand[player].objs",
+                    "min_targets": 2
+                }
+            ],
+            "execution": [
+                "card[1]:set_zone(zones.crib)",
+                "card[2]:set_zone(zones.crib)",
+                "current_player = (current_player == 1) and 2 or 1"
+            ]
+        },
+        "play_card": {
+            "conditions": [
+                "state.play_phase == true",
+                "current_player == player"
+            ],
+            "targets": [
+                {
+                    "name": "card",
+                    "candidates": "zones.hand[player].objs",
+                    "conditions": [
+                        "peg_total + card.pip <= 31"
+                    ]
+                }
+            ],
+            "execution": [
+                "peg_total = peg_total + card.pip",
+                "card:set_zone(zones.play)",
+                "current_player = (current_player == 1) and 2 or 1"
             ]
         }
     }

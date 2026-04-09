@@ -4,7 +4,7 @@ On Turn: Scrap target Royal / Glasses
 At Any Time: Counter target One-Off Effect. Counters may be played during your opponent's turn.
 ]]
 
-local o, zone, game = GetObj()
+local o, game = GetObj()
 
 function is_royal_or_glasses(t)
 	return string.find("8JQK", t.value)

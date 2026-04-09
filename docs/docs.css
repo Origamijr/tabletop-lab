@@ -1,0 +1,116 @@
+@import '../index.css';
+
+.docs-container {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--spacing-md);
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+.docs-sidebar {
+    background: var(--color-bg-secondary);
+    border: var(--border-width) solid var(--color-border-accent);
+    padding: var(--spacing-sm);
+    height: fit-content;
+    position: sticky;
+    top: var(--spacing-md);
+}
+
+.docs-menu {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.doc-section {
+    margin-bottom: var(--spacing-md);
+}
+
+.doc-section-title {
+    font-size: var(--font-size-small);
+    padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-xs) var(--spacing-sm);
+    margin: 0;
+    border-bottom: var(--border-width-thin) solid var(--color-border-accent);
+}
+
+.doc-link {
+    padding: var(--spacing-sm);
+    border-left: var(--border-width) solid transparent;
+    font-size: var(--font-size-base);
+    display: block;
+}
+
+.doc-link:hover {
+    border-left-color: var(--color-text-accent);
+    background: var(--color-bg-hover);
+}
+
+.doc-link.active {
+    border-left-color: var(--color-text-accent);
+    background: var(--color-bg-hover);
+}
+
+.doc-link-sub {
+    padding-left: 1.5rem;
+    font-size: var(--font-size-small);
+}
+
+.docs-content {
+    background: var(--color-bg-secondary);
+    border: var(--border-width) solid var(--color-border-accent);
+    padding: var(--spacing-md);
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
+.doc-page {
+    color: var(--color-border-accent);
+    line-height: 1.4;
+}
+
+.doc-page h1 {
+    margin-bottom: var(--spacing-md);
+    border-bottom: var(--border-width) solid var(--color-border-accent);
+    padding-bottom: var(--spacing-sm);
+}
+
+.doc-page h2 {
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+    .docs-container {
+        grid-template-columns: 1fr;
+    }
+
+    .docs-sidebar {
+        position: static;
+    }
+
+    .docs-content {
+        max-height: none;
+    }
+
+    .docs-menu {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+    }
+
+    .doc-link {
+        flex: 1;
+        min-width: 100px;
+        text-align: center;
+        border-left: none;
+        border-bottom: var(--border-width) solid transparent;
+    }
+
+    .doc-link:hover,
+    .doc-link.active {
+        border-left: none;
+        border-bottom-color: var(--color-text-accent);
+    }
+}

@@ -1,5 +1,4 @@
 {
-    "gamename": "Template",
     "players": 2,
     "zones": {
         "deck": {"quantity": 1},
@@ -41,13 +40,15 @@
                 "state.deal -- state is a dictionary that maps state to a boolean indicating if it's active",
                 "player = current_player -- player (possibly) taking the action can be accessed via 'player'"
             ],
-            "targets": {
-                "name": "t",
-                "candidates": ["zones.hand[player]"],
-                "condition": "function(c) return c.value != 'A'",
-                "min_targets": 1,
-                "max_targets": 2
-            },
+            "targets": [
+                {
+                    "name": "t",
+                    "candidates": "zones.hand[player].objs",
+                    "conditions": "t.value != 'A'",
+                    "min_targets": 1,
+                    "max_targets": 2
+                }
+            ],
             "execution": [
                 "t:send_to(deck)",
                 "return 'sig'"

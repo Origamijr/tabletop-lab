@@ -1,6 +1,6 @@
 # Tabletop Lab
 
-This is yet another board game framework along the lines of ludii, RLCard, and TAP, with the primary aim of training AI to play various board games (primary interest on card games) towards easier self-feedback playtesting.
+This is yet another board game framework along the lines of [ludii](https://ludii.games/), [RLCard](https://rlcard.org/), and [TAP](https://tabletopgames.ai/), with the primary aim of training AI to play various board games (primary interest on card games) towards easier self-feedback playtesting.
 
 Still in conceptualization as this is mostly a for-fun side project, but the main ideas in priority are as follows:
 - Create board game description framework with emphasis on easily extendability (for the purpose of TCG)

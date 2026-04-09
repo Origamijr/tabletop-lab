@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabletop Lab</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="docs/nav.css">
+    <script src="docs/utils.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">Tabletop Lab</a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link active">Play</a></li>
+                <li><a href="docs/about.html" class="nav-link">About</a></li>
+                <li><a href="docs/create.html" class="nav-link">Create</a></li>
+                <li><a href="docs/docs.html" class="nav-link">Docs</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <header>
+            <h1>Tabletop Lab</h1>
+        </header>
+
+        <div class="error" id="error"></div>
+
+        <div class="section">
+            <h2>Load Games from Github Repository</h2>
+            <div class="repo-input">
+                <input
+                    type="text"
+                    id="repoUrl"
+                    placeholder="e.g., Origamijr/tabletop-lab or owner/repo@branch"
+                    value="Origamijr/tabletop-lab"
+                />
+                <button onclick="loadGamesFromRepo()">Load</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Available Games</h2>
+            <input
+                type="text"
+                id="searchInput"
+                class="search-input"
+                placeholder="Search games..."
+            />
+            <div id="gamesList" class="empty-state">
+                Load a repository to see games
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let loadedGames = [];
+        let gameDataCache = {};
+        let expandedCard = null;
+
+        async function loadGamesFromRepo(repoUrl) {
+            const input = document.getElementById('repoUrl');
+            const repo = repoUrl || input.value.trim();
+
+            if (!repo) {
+                showError('Please enter a repository name');
+                return;
+            }
+
+            try {
+                showLoading();
+                // Parse repo format: owner/repo or owner/repo@branch
+                const parts = repo.split('@');
+                const branch = parts.length > 1 ? parts[1] : 'main';
+                const [owner, repoName] = parts[0].split('/');
+
+                if (!owner || !repoName) {
+                    throw new Error('Invalid format. Use: username/repo-name or username/repo-name@branch');
+                }
+
+                // Fetch games folder structure from GitHub API
+                const response = await fetch(
+                    `https://api.github.com/repos/${owner}/${repoName}/contents/games?ref=${branch}`
+                );
+
+                if (!response.ok) {
+                    throw new Error(`Repository not found or doesn't have a games folder`);
+                }
+
+                const data = await response.json();
+                const games = data
+                    .filter(item => item.type === 'dir')
+                    .map(item => item.name);
+
+                if (games.length === 0) {
+                    throw new Error('No games found in repository');
+                }
+
+                loadedGames = games;
+                gameDataCache = {};
+                renderGamesList();
+                clearError();
+            } catch (error) {
+                showError(error.message);
+                loadedGames = [];
+                renderGamesList();
+            }
+        }
+
+        async function loadGameData(gameName) {
+            if (gameDataCache[gameName]) {
+                return gameDataCache[gameName];
+            }
+
+            try {
+                const response = await fetch(`games/${gameName}/ui.json`);
+                if (response.ok) {
+                    const data = await response.json();
+                    gameDataCache[gameName] = data;
+                    return data;
+                }
+            } catch (error) {
+                console.log(`No ui.json for ${gameName}`);
+            }
+
+            gameDataCache[gameName] = { name: gameName };
+            return gameDataCache[gameName];
+        }
+
+        async function toggleGameCard(gameName, element) {
+            const cardContent = element.querySelector('.game-card-content');
+            const toggleSign = element.querySelector('.game-toggle');
+            const isExpanded = cardContent.classList.contains('expanded');
+
+            if (isExpanded) {
+                cardContent.classList.remove('expanded');
+                cardContent.innerHTML = `
+                    <div class="game-header">
+                        <h3>${gameName}</h3>
+                    </div>
+                `;
+                toggleSign.textContent = '+';
+                expandedCard = null;
+            } else {
+                if (expandedCard && expandedCard !== element) {
+                    const prevContent = expandedCard.querySelector('.game-card-content');
+                    const prevToggle = expandedCard.querySelector('.game-toggle');
+                    prevContent.classList.remove('expanded');
+                    prevContent.innerHTML = `
+                        <div class="game-header">
+                            <h3>${expandedCard.dataset.gameName}</h3>
+                        </div>
+                    `;
+                    prevToggle.textContent = '+';
+                }
+
+                const gameData = await loadGameData(gameName);
+                const description = gameData.description || 'No description available';
+                const displayName = gameData.name || gameName;
+
+                cardContent.innerHTML = `
+                    <div class="game-header">
+                        <h3>${displayName}</h3>
+                    </div>
+                    <div class="game-description">${description}</div>
+                    <div class="game-actions">
+                        <button class="btn" onclick="playGame('${gameName}')" disabled>
+                            Play AI
+                        </button>
+                        <button class="btn" onclick="hostMultiplayer('${gameName}')" disabled>
+                            Host MP
+                        </button>
+                        <button class="btn" onclick="editGame('${gameName}')" disabled>
+                            Edit
+                        </button>
+                    </div>
+                `;
+                cardContent.classList.add('expanded');
+                toggleSign.textContent = '-';
+                expandedCard = element;
+            }
+        }
+
+        async function filterAndRenderGames() {
+            const gamesList = document.getElementById('gamesList');
+            const searchInput = document.getElementById('searchInput');
+            const searchTerm = searchInput.value.trim();
+
+            if (loadedGames.length === 0) {
+                gamesList.innerHTML =
+                    '<div class="empty-state">No games available. Load from a repository.</div>';
+                return;
+            }
+
+            let filtered = loadedGames;
+
+            if (searchTerm) {
+                filtered = [];
+                for (const game of loadedGames) {
+                    const gameData = await loadGameData(game);
+                    const displayName = gameData.name || game;
+                    const description = gameData.description || '';
+                    const searchText = `${displayName} ${description}`;
+
+                    if (fuzzyMatch(searchTerm, searchText)) {
+                        filtered.push(game);
+                    }
+                }
+            }
+
+            if (filtered.length === 0) {
+                gamesList.innerHTML =
+                    '<div class="empty-state">No games match your search.</div>';
+                return;
+            }
+
+            gamesList.innerHTML = filtered
+                .map(
+                    game => `
+                <div class="game-card" onclick="toggleGameCard('${game}', this)" data-game-name="${game}">
+                    <div class="game-card-content">
+                        <div class="game-header">
+                            <h3>${game}</h3>
+                        </div>
+                    </div>
+                    <div class="game-toggle">+</div>
+                </div>
+            `
+                )
+                .join('');
+        }
+
+        function renderGamesList() {
+            expandedCard = null;
+            filterAndRenderGames();
+        }
+
+        function hostMultiplayer(gameName) {
+            alert(`Multiplayer for ${gameName} - Coming soon!`);
+        }
+
+        function playGame(gameName) {
+            alert(`Playing ${gameName} - Coming soon!`);
+        }
+
+        function editGame(gameName) {
+            alert(`Game editor for ${gameName} - Coming soon!`);
+        }
+
+        // Load no games on startup - user must load from repo
+        window.addEventListener('load', () => {
+            loadedGames = [];
+            renderGamesList();
+            
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', filterAndRenderGames);
+        });
+    </script>
+</body>
+</html>

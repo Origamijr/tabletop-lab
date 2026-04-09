@@ -1,6 +1,5 @@
 local score
 
--- ChatGPT generated
 -- Helper: normalize rank (1..13) and pip value for 15s (A=1, 2..10 numeric, J/Q/K=10)
 local function rank_of(card)
 	local v = card.value
@@ -117,7 +116,17 @@ function score(starter, cards)
 		end
 	end
 
-	return combos, total
+	-- Log all combos with card UIDs instead of card objects
+	for _, combo in ipairs(combos) do
+		local card_uids = {}
+		for _, card in ipairs(combo.cards) do
+			table.insert(card_uids, card._uid)
+		end
+		GAME:log(string.format('Scored %d (%s)', combo.score, combo.type), 
+			{type="score_"..combo.type, cards=card_uids, score=combo.score})
+	end
+
+	return total
 end
 
 return score

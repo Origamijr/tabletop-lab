@@ -1,0 +1,21 @@
+# Ignore everything
+*
+
+# But not directories (the trailing slash matters!)
+#!*/
+
+# And not these specific directories
+!cribbage/
+!cribbage/*
+!cuttle/
+!cuttle/*
+!hokm/
+!hokm/*
+!spysweeper/
+!spysweeper/*
+!template/
+!template/*
+
+# Ignore hidden files
+.*
+!.gitignore

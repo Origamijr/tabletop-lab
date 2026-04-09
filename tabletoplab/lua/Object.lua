@@ -1,6 +1,5 @@
 local Object = {}
 
--- module-level unique id counter
 local __next_object_id = 0
 
 function Object:new(o)
@@ -11,15 +10,13 @@ function Object:new(o)
     __next_object_id = __next_object_id + 1
     o._uid = __next_object_id
 
-    -- history of zones this object has been in; index 1 is current
-    o._zones = o._zones or {}
+    o._zones = o._zones or {} -- history of zones this object has been in; index 1 is current
     o._actions = o._actions or {}
-    o.game = nil -- reference to parent Gamestate, set by Zone:load_collection()
 
     return o
 end
 
-function Object:set_zone(zone)
+function Object:set_zone(zone, suppress_log)
     local current = self._zones and self._zones[1]
     if current and current.objs then
         for i = #current.objs, 1, -1 do
@@ -37,6 +34,10 @@ function Object:set_zone(zone)
 
     table.insert(self._zones, 1, zone)
 
+    if not suppress_log then
+        GAME:log(string.format("move %s -> %s", self._uid, zone:get_name()), 
+            {event="OBJ_SET_ZONE", obj_id=self._uid, zone_id=zone._uid})
+    end
     return self
 end
 

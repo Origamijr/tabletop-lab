@@ -21,6 +21,7 @@
     "variables": {
     },
     "init": [
+        "load_collection(zones.deck, 'cards', Card)"
     ],
     "gamestates": {
         "deal": {

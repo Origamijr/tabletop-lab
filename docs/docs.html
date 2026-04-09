@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - Tabletop Lab</title>
+    <link rel="stylesheet" href="../index.css">
+    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="docs.css">
+    <script src="utils.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-brand">Tabletop Lab</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Play</a></li>
+                <li><a href="about.html" class="nav-link">About</a></li>
+                <li><a href="create.html" class="nav-link">Create</a></li>
+                <li><a href="docs.html" class="nav-link active">Docs</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="docs-container">
+        <aside class="docs-sidebar">
+            <div class="docs-menu" id="docs-menu">
+                <p class="loading">Loading documentation...</p>
+            </div>
+        </aside>
+        
+        <main class="docs-content">
+            <div id="doc-display" class="doc-page markdown-content">
+                <p class="loading">Select a document to view</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const docsPath = '.';
+        
+        // Folder structure with markdown files
+        const folderStructure = [
+            {
+                name: 'API Reference',
+                path: 'api reference',
+                file: 'stub.md',
+                subfolders: [
+                    {
+                        name: 'Core Classes',
+                        path: 'api reference/Core Classes',
+                        file: 'stub.md'
+                    }
+                ]
+            },
+            {
+                name: 'Creating a New Game',
+                path: 'creating a new game',
+                file: 'stub.md',
+                subfolders: []
+            }
+        ];
+
+        function buildMenu() {
+            const menu = document.getElementById('docs-menu');
+            let html = '';
+
+            // Add folder structure
+            for (const folder of folderStructure) {
+                html += `<div class="doc-section">`;
+                html += `<h4 class="doc-section-title">${folder.name}</h4>`;
+                
+                // Add folder's main file
+                if (folder.file) {
+                    const displayName = folder.file.replace('.md', '');
+                    html += `<a href="#" class="doc-link" data-file="${folder.file}" data-path="${folder.path}">${displayName}</a>`;
+                }
+                
+                // Add subfolders
+                if (folder.subfolders && folder.subfolders.length > 0) {
+                    for (const subfolder of folder.subfolders) {
+                        const displayName = subfolder.file.replace('.md', '');
+                        html += `<a href="#" class="doc-link doc-link-sub" data-file="${subfolder.file}" data-path="${subfolder.path}">→ ${displayName}</a>`;
+                    }
+                }
+                
+                html += `</div>`;
+            }
+
+            menu.innerHTML = html;
+
+            // Attach click handlers
+            document.querySelectorAll('.doc-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('.doc-link').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                    loadDoc(link.dataset.file, link.dataset.path);
+                });
+            });
+        }
+
+        async function loadDoc(filename, filepath) {
+            try {
+                const fullPath = filepath ? `${filepath}/${filename}` : filename;
+                const response = await fetch(fullPath);
+                const markdown = await response.text();
+                const content = document.getElementById('doc-display');
+                content.innerHTML = markdownToHtml(markdown);
+            } catch (error) {
+                document.getElementById('doc-display').innerHTML = 
+                    '<p class="error">Error loading document.</p>';
+            }
+        }
+
+        window.addEventListener('load', buildMenu);
+    </script>
+</body>
+</html>
