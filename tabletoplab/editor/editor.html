@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create - Tabletop Lab</title>
+    <title>Create — Tabletop Lab</title>
     <link rel="stylesheet" href="../../docs/index.css">
     <link rel="stylesheet" href="../../docs/nav.css">
     <link rel="stylesheet" href="editor.css">
-    <link rel="stylesheet" href="ui/ui.css">
+    <link rel="stylesheet" href="board/board.css">
+    <link rel="stylesheet" href="scripting/scripting.css">
+    <link rel="stylesheet" href="gamestate/gamestate.css">
     <link rel="stylesheet" href="collections/collections.css">
 </head>
 <body>
@@ -24,16 +26,15 @@
     </nav>
 
     <div id="editor-app">
-        <!-- Header with import/export buttons -->
         <div class="editor-header">
             <div class="editor-title">Game Editor</div>
             <div class="editor-controls">
-                <button class="btn" id="btn-import">Import Game</button>
-                <button class="btn btn-primary" id="btn-export">Export Game</button>
+                <span class="dirty-indicator" id="dirty-indicator"></span>
+                <button class="btn btn-sm" id="btn-import">Import</button>
+                <button class="btn btn-sm" id="btn-export">Export</button>
             </div>
         </div>
 
-        <!-- Tab Navigation -->
         <div class="editor-tabs">
             <button class="tab-btn active" data-tab="board">Board</button>
             <button class="tab-btn" data-tab="gamestate">Game State</button>
@@ -41,37 +42,22 @@
             <button class="tab-btn" data-tab="collections">Collections</button>
         </div>
 
-        <!-- Tab Content -->
         <div class="editor-content">
-            <!-- Board Tab -->
-            <div class="tab-pane active" data-tab="board" id="pane-board"></div>
-
-            <!-- Game State Tab -->
-            <div class="tab-pane" data-tab="gamestate" id="pane-gamestate">
-                <div class="editor-placeholder">
-                    <h2>Game State Editor</h2>
-                    <p>Configure states, transitions, and actions</p>
-                </div>
-            </div>
-
-            <!-- Scripting Tab -->
-            <div class="tab-pane" data-tab="scripting" id="pane-scripting">
-                <div class="editor-placeholder">
-                    <h2>Scripting Editor</h2>
-                    <p>Create scripts for game logic</p>
-                </div>
-            </div>
-
-            <!-- Collections Tab -->
-            <div class="tab-pane" data-tab="collections" id="pane-collections"></div>
+            <div class="tab-pane active" data-tab="board"       id="pane-board"></div>
+            <div class="tab-pane"        data-tab="scripting"   id="pane-scripting"></div>
+            <div class="tab-pane"        data-tab="gamestate"   id="pane-gamestate"></div>
+            <div class="tab-pane"        data-tab="collections" id="pane-collections"></div>
         </div>
     </div>
 
-    <script src="../../docs/utils.js"></script>
+    <!-- Load order: config → editor shell → tab modules -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="gameConfig.js"></script>
-    <script src="editor.js"></script>
-    <script src="ui/ui.js"></script>
+    <script src="board/board.js"></script>
+    <script src="scripting/blocks.js"></script>
+    <script src="scripting/scripting.js"></script>
+    <script src="gamestate/gamestate.js"></script>
     <script src="collections/collections.js"></script>
+    <script src="editor.js"></script>
 </body>
 </html>

@@ -1,291 +1,370 @@
 /* Collections Editor Styles */
 
 .collections-editor {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 1.5rem;
+    display: flex;
     width: 100%;
     height: 100%;
+    overflow: hidden;
+    flex-direction: row;
 }
 
-/* Collection Tabs */
-.collections-tabs {
-    grid-column: 1 / -1;
+/* ── Left: CSV panel ───────────────────────────────────── */
+.csv-panel {
+    width: 340px;
+    flex-shrink: 0;
     display: flex;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    background: white;
-    border: 1px solid var(--editor-border);
-    border-radius: 4px;
+    flex-direction: column;
+    border-right: 1px solid var(--color-border);
+    overflow: hidden;
+}
+
+/* Collection tabs */
+.collection-tabs-bar {
+    display: flex;
+    gap: 2px;
+    padding: 0.4rem 0.5rem;
+    background: var(--color-bg-tertiary);
+    border-bottom: 1px solid var(--color-border);
     overflow-x: auto;
-    flex-wrap: wrap;
+    flex-shrink: 0;
     align-items: center;
-}
-
-.collections-list {
-    display: flex;
-    gap: 0.5rem;
-    flex: 1;
+    flex-wrap: nowrap;
 }
 
 .collection-tab {
-    padding: 0.5rem 1rem;
-    background: #f0f0f0;
-    border: 1px solid var(--editor-border);
-    border-radius: 3px;
+    padding: 0.25rem 0.6rem;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    font-size: 0.7rem;
     cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.2s;
     white-space: nowrap;
-}
-
-.collection-tab:hover {
-    background: #e0e0e0;
-}
-
-.collection-tab.active {
-    background: var(--editor-accent);
-    color: white;
-    border-color: var(--editor-accent);
-}
-
-.collection-tab-close {
-    margin-left: 0.5rem;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.collections-section {
     display: flex;
-    flex-direction: column;
-    background: white;
-    border: 1px solid var(--editor-border);
-    border-radius: 4px;
-    overflow: hidden;
+    align-items: center;
+    gap: 0.3rem;
+    transition: border-color 0.1s, background 0.1s;
 }
+.collection-tab:hover  { border-color: var(--color-text-secondary); }
+.collection-tab.active { border-color: var(--color-text-accent); color: var(--color-text-accent); background: rgba(255,255,0,0.04); }
+.collection-tab-close  { color: var(--color-text-error); font-size: 0.75rem; opacity: 0.5; }
+.collection-tab:hover .collection-tab-close { opacity: 1; }
 
-.collections-section h3 {
-    margin: 0;
-    padding: 1rem;
-    background: #f8f8f8;
-    border-bottom: 1px solid var(--editor-border);
-    font-size: 0.95rem;
-    color: #555;
-}
-
-/* CSV Editor Styles */
+/* CSV toolbar */
 .csv-toolbar {
     display: flex;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    border-bottom: 1px solid var(--editor-border);
+    gap: 0.3rem;
+    padding: 0.35rem 0.5rem;
+    background: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
     flex-wrap: wrap;
+    flex-shrink: 0;
 }
 
-#csv-wrap {
+/* CSV table */
+.csv-wrap {
     flex: 1;
     overflow: auto;
-    padding: 0.75rem;
-    background: white;
 }
 
-/* CSV Table */
-#csv-table {
+#coll-csv-table {
     border-collapse: collapse;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     min-width: 100%;
-    font-family: monospace;
+    font-family: var(--font-family);
 }
-
-#csv-table th {
-    background: #f0f0f0;
-    border: 1px solid var(--editor-border);
-    padding: 0.5rem;
-    text-align: left;
-    color: #666;
-    font-weight: 500;
-    white-space: nowrap;
+#coll-csv-table th {
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    padding: 0.3rem 0.4rem;
     position: sticky;
     top: 0;
     z-index: 2;
+    white-space: nowrap;
 }
-
-#csv-table td {
-    border: 1px solid var(--editor-border);
+#coll-csv-table td {
+    border: 1px solid rgba(127,127,127,0.2);
     padding: 0;
-    transition: background 0.1s;
 }
-#csv-table tr:hover td { 
-    background: rgba(200, 220, 255, 0.3);
-}
+#coll-csv-table tr:hover td { background: rgba(255,255,255,0.03); }
 
-/* Cell inputs */
-#csv-table td input {
+#coll-csv-table td input {
     width: 100%;
     background: transparent;
     border: none;
-    color: #333;
-    padding: 0.4rem;
-    font-family: monospace;
-    font-size: 0.85rem;
-    min-width: 80px;
+    color: var(--color-text-primary);
+    padding: 0.3rem 0.4rem;
+    font-family: var(--font-family);
+    font-size: 0.75rem;
+    min-width: 60px;
 }
-#csv-table td input:focus {
-    outline: none;
-    background: #fffef0;
-}
+#coll-csv-table td input:focus { outline: none; background: rgba(255,255,0,0.04); }
 
-/* Row number gutter */
-.row-num {
-    color: #999;
-    background: #f8f8f8 !important;
-    padding: 0.4rem;
-    font-size: 0.8rem;
+.csv-row-num {
+    color: var(--color-text-secondary);
+    background: var(--color-bg-tertiary) !important;
+    padding: 0.3rem 0.4rem;
+    font-size: 0.65rem;
     text-align: right;
-    min-width: 40px;
+    min-width: 28px;
     user-select: none;
-    border: 1px solid var(--editor-border);
+    border: 1px solid rgba(127,127,127,0.2);
 }
 
-/* Column header: editable input + delete button */
-.col-header-wrap {
+.csv-col-header {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
-    min-width: 80px;
+    gap: 0.3rem;
+    min-width: 70px;
 }
-.col-header-wrap input {
+.csv-col-header input {
     background: transparent;
     border: none;
-    color: #666;
-    font-family: monospace;
-    font-size: 0.8rem;
-    font-weight: 500;
+    color: var(--color-text-secondary);
+    font-family: var(--font-family);
+    font-size: 0.7rem;
+    font-weight: bold;
     text-transform: uppercase;
-    min-width: 60px;
-    padding: 0;
+    min-width: 50px;
     flex: 1;
+    padding: 0.15rem;
 }
-.col-header-wrap input:focus { 
-    outline: none; 
-    color: #0066cc;
-}
+.csv-col-header input:focus { outline: none; color: var(--color-text-accent); }
 
-.col-del {
+.csv-col-del {
+    color: var(--color-text-error);
     opacity: 0.3;
     cursor: pointer;
-    font-size: 0.75rem;
-    color: #cc3333;
-    transition: opacity 0.15s;
+    font-size: 0.65rem;
+}
+.csv-col-del:hover { opacity: 1; }
+
+/* ── Center: Card layout + preview ─────────────────────── */
+.card-layout-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-right: 1px solid var(--color-border);
+}
+
+.preview-section {
+    display: flex;
+    flex-direction: column;
+    height: 220px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.layout-divider {
+    height: 1px;
+    background: var(--color-border);
     flex-shrink: 0;
 }
-.col-del:hover { 
-    opacity: 1; 
-}
 
-/* Render Controls */
-.render-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
-    overflow-y: auto;
+.card-layout-wrap {
     flex: 1;
-}
-
-.form-group {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    overflow: hidden;
 }
 
-.form-group label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #555;
-}
-
-.form-group input,
-.render-textarea {
-    padding: 0.5rem;
-    border: 1px solid var(--editor-border);
-    border-radius: 3px;
-    font-size: 0.85rem;
-    font-family: monospace;
-}
-
-.render-textarea {
-    min-height: 120px;
-    resize: vertical;
-    font-family: 'Monaco', 'Menlo', monospace;
-}
-
-.form-group input:focus,
-.render-textarea:focus {
-    outline: none;
-    border-color: var(--editor-accent);
-    box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
-}
-
-/* Preview Section */
-.preview-section {
-    grid-column: 1 / -1;
-}
-
-.collections-preview {
+/* Card canvas */
+.card-canvas-outer {
     flex: 1;
     overflow: auto;
-    padding: 1rem;
-    background: #fafafa;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-    align-content: start;
+    background: var(--color-bg-tertiary);
+    background-image:
+        linear-gradient(to right, rgba(127,127,127,0.1) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(127,127,127,0.1) 1px, transparent 1px);
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    padding: 1.5rem;
 }
 
-.preview-card {
-    background: white;
-    border: 1px solid var(--editor-border);
-    border-radius: 4px;
-    overflow: hidden;
+#card-canvas {
+    position: relative;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+
+/* ── Right: Template editor ────────────────────────────── */
+.template-panel {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    border-right: none;
+    overflow: visible;
+}
+
+.template-panel.collapsed {
+    width: 24px;
+}
+
+.panel-collapse-toggle {
+    width: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-secondary);
+    border-left: 1px solid var(--color-border);
     cursor: pointer;
-    transition: all 0.2s;
+    user-select: none;
+    font-size: 1.2rem;
+    color: var(--color-text-secondary);
+    transition: background 0.1s;
 }
 
-.preview-card:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-color: var(--editor-accent);
+.panel-collapse-toggle:hover {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
 }
 
-.preview-card-content {
+.template-editor-body {
+    flex: 1;
+    overflow-y: auto;
     padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
-.preview-card img {
-    width: 100%;
-    height: auto;
-    display: block;
-    max-height: 300px;
-    object-fit: cover;
+.template-editor-body .form-group { margin: 0; }
+
+#coll-template {
+    flex: 1;
+    min-height: 160px;
+    resize: vertical;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    font-family: var(--font-family);
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    padding: 0.5rem;
+}
+#coll-template:focus { outline: none; border-color: var(--color-text-accent); }
+
+.template-hint {
+    font-size: 0.65rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+}
+.template-hint code {
+    color: var(--color-text-accent);
+    font-family: var(--font-family);
 }
 
-/* Responsive */
-@media (max-width: 1600px) {
-    .collections-editor {
-        grid-template-columns: 1fr 1fr;
-    }
+/* Substitution list */
+.sub-list { display: flex; flex-direction: column; gap: 2px; }
+.sub-row {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+    font-size: 0.72rem;
+}
+.sub-row input {
+    flex: 1;
+    padding: 0.2rem 0.3rem;
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    font-family: var(--font-family);
+    font-size: 0.72rem;
+    min-width: 0;
+}
+.sub-row input:focus { outline: none; border-color: var(--color-text-accent); }
+.sub-del {
+    color: var(--color-text-error);
+    cursor: pointer;
+    opacity: 0.5;
+    flex-shrink: 0;
+    font-size: 0.7rem;
+}
+.sub-del:hover { opacity: 1; }
 
-    .preview-section {
-        grid-column: 1 / -1;
-    }
+/* Card layout elements */
+.card-el {
+    position: absolute;
+    border: 1px solid rgba(127,127,127,0.4);
+    overflow: hidden;
+    cursor: move;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+    user-select: none;
+    transition: border-color 0.1s;
+    background: rgba(255,255,255,0.02);
+}
+.card-el:hover    { border-color: var(--color-text-secondary); }
+.card-el.selected { border-color: var(--color-text-accent); background: rgba(255,255,0,0.05); }
+.card-el-label {
+    pointer-events: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0.1rem 0.2rem;
+    font-size: 0.6rem;
+    color: var(--color-text-accent);
+    text-transform: uppercase;
+}
+.card-el-resize {
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 10px; height: 10px;
+    cursor: se-resize;
+    background: linear-gradient(135deg, transparent 40%, var(--color-border) 40%);
+}
+.card-el.selected .card-el-resize {
+    background: linear-gradient(135deg, transparent 40%, var(--color-text-accent) 40%);
 }
 
-@media (max-width: 1024px) {
-    .collections-editor {
-        grid-template-columns: 1fr;
-    }
+/* Card element inspector */
+.card-inspector {
+    width: 180px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg-secondary);
+    border-left: 1px solid var(--color-border);
+    overflow: hidden;
+}
+.card-inspector .panel-body { display: flex; flex-direction: column; gap: 0.5rem; }
 
-    .csv-row {
-        grid-auto-columns: 120px;
-    }
+/* Preview row */
+.preview-bar {
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.4rem 0.75rem;
+    background: var(--color-bg-secondary);
+    font-size: 0.65rem;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.3rem;
+    flex-shrink: 0;
+}
+
+.preview-scroll {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #111;
+}
+
+.preview-card-frame {
+    flex-shrink: 0;
+    background: white;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
 }

@@ -1,0 +1,331 @@
+/* board/board.css */
+
+.board-editor {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    flex-direction: column;
+}
+
+.board-toolbar {
+    display: flex;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-bg-tertiary);
+    border-bottom: var(--border-width-thin) solid var(--color-border);
+    flex-shrink: 0;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.board-toolbar .toolbar-right {
+    margin-left: auto;
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.snap-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    user-select: none;
+}
+
+.snap-toggle input[type="checkbox"] {
+    accent-color: var(--color-text-accent);
+}
+
+.board-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ── Sidebar ── */
+.board-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg-secondary);
+    border-right: var(--border-width) solid var(--color-border);
+    overflow-y: auto;
+}
+
+.board-sidebar-section {
+    padding: var(--spacing-sm);
+    border-bottom: var(--border-width-thin) solid var(--color-border);
+}
+
+.board-sidebar-section h4 {
+    font-size: var(--font-size-small);
+    color: var(--color-text-accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: var(--spacing-sm);
+}
+
+.grid-config {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.grid-config .cfg-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.grid-config label {
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    min-width: 50px;
+}
+
+.grid-config input {
+    flex: 1;
+    padding: 2px var(--spacing-xs);
+    border: var(--border-width-thin) solid var(--color-border);
+    background: var(--color-text-light);
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+}
+
+/* Zone picker list */
+.board-zone-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.board-zone-entry {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--color-bg-tertiary);
+    border: var(--border-width-thin) solid transparent;
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.1s;
+}
+
+.board-zone-entry:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-light);
+}
+
+.board-zone-entry.placed {
+    color: var(--color-text-accent);
+    border-color: var(--color-border);
+}
+
+.zone-entry-qty {
+    font-size: 0.65rem;
+    color: var(--color-text-secondary);
+}
+
+/* Properties panel */
+.board-props {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.prop-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.prop-row label {
+    min-width: 55px;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+}
+
+.prop-row input,
+.prop-row select {
+    flex: 1;
+    padding: 2px var(--spacing-xs);
+    border: var(--border-width-thin) solid var(--color-border);
+    background: var(--color-text-light);
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+}
+
+.no-selection {
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    font-style: italic;
+}
+
+/* ── Canvas area ── */
+.board-canvas-wrap {
+    flex: 1;
+    overflow: auto;
+    background: var(--color-bg-primary);
+    position: relative;
+}
+
+.board-canvas {
+    position: relative;
+    background-color: #111;
+    background-image:
+        linear-gradient(rgba(126,126,126,0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(126,126,126,0.12) 1px, transparent 1px);
+    /* size and px set by JS */
+}
+
+/* ── Right panel (settings) ── */
+.board-right-panel {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: row;
+    background: var(--color-bg-secondary);
+    border-left: var(--border-width) solid var(--color-border);
+    overflow: visible;
+}
+
+.board-right-panel.collapsed {
+    width: 24px;
+}
+
+.panel-collapse-toggle {
+    width: 24px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-secondary);
+    border-left: 1px solid var(--color-border);
+    cursor: pointer;
+    user-select: none;
+    font-size: 1.2rem;
+    color: var(--color-text-secondary);
+    transition: background 0.1s;
+}
+
+.panel-collapse-toggle:hover {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+}
+
+.board-settings-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.board-settings-body .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.board-settings-body label {
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.board-settings-body input,
+.board-settings-body textarea {
+    padding: 0.4rem;
+    border: var(--border-width-thin) solid var(--color-border);
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+}
+
+.board-settings-body input:focus,
+.board-settings-body textarea:focus {
+    outline: none;
+    border-color: var(--color-text-accent);
+    background: rgba(255,255,0,0.02);
+}
+
+.board-settings-body textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* ── Placed zone divs ── */
+.board-zone-div {
+    position: absolute;
+    border: 2px solid var(--color-border);
+    background: rgba(4, 126, 126, 0.12);
+    box-sizing: border-box;
+    cursor: move;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.board-zone-div:hover {
+    border-color: var(--color-text-secondary);
+}
+
+.board-zone-div.selected {
+    border-color: var(--color-text-accent);
+    background: rgba(255,255,0,0.06);
+}
+
+/* dashed = relative indexing */
+.board-zone-div.relative-indexed {
+    border-style: dashed;
+}
+
+.zone-div-label {
+    font-size: 0.6rem;
+    font-family: var(--font-family);
+    color: var(--color-text-accent);
+    text-transform: uppercase;
+    padding: 2px 4px;
+    background: rgba(0,0,0,0.6);
+    pointer-events: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+}
+
+.zone-div-index {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 0.55rem;
+    color: var(--color-text-secondary);
+    pointer-events: none;
+}
+
+.resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    cursor: se-resize;
+    background: var(--color-border);
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.board-zone-div.selected .resize-handle {
+    background: var(--color-text-accent);
+}

@@ -1,167 +1,119 @@
 /**
  * gameConfig.js
- * ─────────────────────────────────────────────────────────────
- * Shared data structure for game configuration.
- * Referenced by: Board, Game State, Scripting, Collections tabs
- * 
- * This is the source of truth for all game data that gets
- * imported/exported to game.json. All tabs read/write through
- * this module to ensure consistency.
- * ─────────────────────────────────────────────────────────────
+ * Central data store. All tabs read/write through this.
+ * game.json  — gameplay logic (zones, states, actions, variables, init, collections csv)
+ * ui.json    — layout/meta (gridSize, zone placements, collection layouts, gamename, rules)
  */
 
 class GameConfig {
     constructor() {
-        this.data = {
-            gamename: '',
+        // ── game.json fields ──
+        this.game = {
             players: 2,
-            zones: {},           // Board tab: { zoneName: { quantity, visibility, display_mode } }
-            gamestates: {},      // Game State tab: { stateName: { transitions: [], ... } }
-            actions: {},         // Game State tab: { actionName: { triggers: [], effects: [], ... } }
-            variables: {},       // Global game variables
-            init: [],            // Initialization script
-            collections: {},     // Collections tab: { collName: { csv, renderScript } }
-            scripting: {}        // Scripting tab: { scriptName: luaCode }
+            zones: {},       // { name: { quantity, visibility, display_mode } }
+            variables: {},   // { name: value }
+            init: [],        // lua lines
+            gamestates: {},  // { name: { initial?, on_enter[], transitions[] } }
+            actions: {},     // { name: { condition[], targets[], execution[] } }
+            collections: {}  // { name: { csv: { headers[], rows[][] } } }
+        };
+
+        // ── ui.json fields ──
+        this.ui = {
+            gamename: '',
+            description: '',
+            rules: '',
+            gridSize: { w: 63, h: 88 }, // default: poker card size in px at 96dpi
+            layout: {},          // { zoneName: { x,y,w,h, indexing:'absolute'|'relative', instances:[{x,y}] } }
+            collectionLayouts: {} // { collName: { gridW, gridH, elements:[{x,y,w,h,source,type}] } }
         };
     }
 
-    /**
-     * Load game data from gameData object (from editor.js)
-     */
-    load(gameData) {
-        this.data = { ...gameData };
+    // ── Serialisation ──
+
+    exportGame() {
+        return JSON.parse(JSON.stringify(this.game));
     }
 
-    /**
-     * Export game data back to gameData object
-     */
-    export() {
-        return { ...this.data };
+    exportUI() {
+        return JSON.parse(JSON.stringify(this.ui));
     }
 
-    /**
-     * Get all zones (Board tab)
-     */
-    getZones() {
-        return this.data.zones;
+    importGame(data) {
+        this.game = Object.assign({
+            players: 2, zones: {}, variables: {}, init: [],
+            gamestates: {}, actions: {}, collections: {}
+        }, data);
     }
 
-    /**
-     * Get all game states (Game State tab)
-     */
-    getGameStates() {
-        return this.data.gamestates;
+    importUI(data) {
+        this.ui = Object.assign({
+            gamename: '', description: '', rules: '',
+            gridSize: { w: 63, h: 88 },
+            layout: {}, collectionLayouts: {}
+        }, data);
     }
 
-    /**
-     * Get all actions (Game State tab)
-     */
-    getActions() {
-        return this.data.actions;
+    // ── game.json helpers ──
+
+    getZones()      { return this.game.zones; }
+    getZone(n)      { return this.game.zones[n]; }
+    setZone(n, cfg) { this.game.zones[n] = cfg; }
+    deleteZone(n)   { delete this.game.zones[n]; }
+
+    getGameStates()       { return this.game.gamestates; }
+    setGameState(n, cfg)  { this.game.gamestates[n] = cfg; }
+    deleteGameState(n)    { delete this.game.gamestates[n]; }
+
+    getActions()       { return this.game.actions; }
+    setAction(n, cfg)  { this.game.actions[n] = cfg; }
+    deleteAction(n)    { delete this.game.actions[n]; }
+
+    getVariables()      { return this.game.variables; }
+    setVariable(n, v)   { this.game.variables[n] = v; }
+    deleteVariable(n)   { delete this.game.variables[n]; }
+
+    getCollections()         { return this.game.collections; }
+    getCollection(n)         { return this.game.collections[n]; }
+    setCollection(n, data)   { this.game.collections[n] = data; }
+    deleteCollection(n)      { delete this.game.collections[n]; }
+
+    // ── ui.json helpers ──
+
+    getGridSize()      { return this.ui.gridSize; }
+    setGridSize(w, h)  { this.ui.gridSize = { w, h }; }
+
+    getLayout()           { return this.ui.layout; }
+    getZoneLayout(n)      { return this.ui.layout[n]; }
+    setZoneLayout(n, cfg) { this.ui.layout[n] = cfg; }
+    deleteZoneLayout(n)   { delete this.ui.layout[n]; }
+
+    getCollectionLayout(n)      { return this.ui.collectionLayouts[n]; }
+    setCollectionLayout(n, cfg) { this.ui.collectionLayouts[n] = cfg; }
+    deleteCollectionLayout(n)   { delete this.ui.collectionLayouts[n]; }
+
+    getMeta()              { return { gamename: this.ui.gamename, description: this.ui.description, rules: this.ui.rules }; }
+    setMeta(name, desc, rules) {
+        this.ui.gamename = name;
+        this.ui.description = desc;
+        this.ui.rules = rules;
     }
 
-    /**
-     * Get all variables (referenced by all tabs)
-     */
-    getVariables() {
-        return this.data.variables;
-    }
-
-    /**
-     * Add/update a zone (Board tab)
-     */
-    setZone(name, config) {
-        this.data.zones[name] = config;
-    }
-
-    /**
-     * Delete a zone (Board tab)
-     */
-    deleteZone(name) {
-        delete this.data.zones[name];
-    }
-
-    /**
-     * Add/update a game state (Game State tab)
-     */
-    setGameState(name, config) {
-        this.data.gamestates[name] = config;
-    }
-
-    /**
-     * Delete a game state (Game State tab)
-     */
-    deleteGameState(name) {
-        delete this.data.gamestates[name];
-    }
-
-    /**
-     * Add/update an action (Game State tab)
-     */
-    setAction(name, config) {
-        this.data.actions[name] = config;
-    }
-
-    /**
-     * Delete an action (Game State tab)
-     */
-    deleteAction(name) {
-        delete this.data.actions[name];
-    }
-
-    /**
-     * Add/update a variable (any tab)
-     */
-    setVariable(name, value) {
-        this.data.variables[name] = value;
-    }
-
-    /**
-     * Delete a variable (any tab)
-     */
-    deleteVariable(name) {
-        delete this.data.variables[name];
-    }
-
-    /**
-     * Add/update a script (Scripting tab)
-     */
-    setScript(name, luaCode) {
-        this.data.scripting[name] = luaCode;
-    }
-
-    /**
-     * Get a script (Scripting tab)
-     */
-    getScript(name) {
-        return this.data.scripting[name] || '';
-    }
-
-    /**
-     * Get all scripts (Scripting tab)
-     */
-    getScripts() {
-        return this.data.scripting;
-    }
-
-    /**
-     * Set game metadata (any tab)
-     */
-    setMetadata(gamename, players) {
-        this.data.gamename = gamename;
-        this.data.players = players;
-    }
-
-    /**
-     * Get game metadata
-     */
     getMetadata() {
         return {
-            gamename: this.data.gamename,
-            players: this.data.players
+            name: this.ui.gamename,
+            description: this.ui.description,
+            rules: this.ui.rules,
+            players: this.game.players
         };
+    }
+
+    setMetadata(data) {
+        if (data.name !== undefined) this.ui.gamename = data.name;
+        if (data.description !== undefined) this.ui.description = data.description;
+        if (data.rules !== undefined) this.ui.rules = data.rules;
+        if (data.players !== undefined) this.game.players = data.players;
     }
 }
 
-// Global instance
 window.gameConfig = new GameConfig();

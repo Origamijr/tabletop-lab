@@ -1,0 +1,287 @@
+/* gamestate/gamestate.css */
+
+.gamestate-editor {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* ── Actions sidebar ── */
+.gs-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: var(--color-bg-secondary);
+    border-right: var(--border-width) solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.gs-sidebar-inner {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-sm);
+}
+
+.gs-action-item {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--color-bg-tertiary);
+    border: var(--border-width-thin) solid var(--color-border);
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+    transition: background 0.1s;
+}
+
+.gs-action-item:hover {
+    background: var(--color-bg-hover);
+    color: var(--color-text-light);
+}
+
+.gs-action-del {
+    color: var(--color-text-error);
+    font-weight: bold;
+    opacity: 0.4;
+    cursor: pointer;
+    padding: 0 2px;
+}
+
+.gs-action-item:hover .gs-action-del {
+    opacity: 1;
+}
+
+/* ── Canvas ── */
+.gs-canvas-wrap {
+    flex: 1;
+    overflow: auto;
+    background: #0d0d0d;
+    position: relative;
+}
+
+.gs-canvas {
+    position: relative;
+    min-width: 100%;
+    min-height: 100%;
+    background-image:
+        radial-gradient(circle, rgba(126,126,126,0.1) 1px, transparent 1px);
+    background-size: 30px 30px;
+}
+
+/* ── State blocks ── */
+.gs-state-block {
+    position: absolute;
+    min-width: 160px;
+    background: var(--color-bg-tertiary);
+    border: 2px solid var(--color-border);
+    cursor: move;
+    user-select: none;
+    font-size: var(--font-size-small);
+}
+
+.gs-state-block.initial {
+    border-color: var(--color-text-accent);
+}
+
+.gs-state-block.selected {
+    border-color: #00aaff;
+    box-shadow: 0 0 8px rgba(0,170,255,0.3);
+}
+
+.gs-state-header {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border);
+    background: rgba(255,255,255,0.03);
+}
+
+.gs-state-name {
+    color: var(--color-text-accent);
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    flex: 1;
+}
+
+.gs-state-name-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-accent);
+    font-family: var(--font-family);
+    font-weight: bold;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    width: 100%;
+    padding: 0;
+}
+
+.gs-state-name-input:focus {
+    outline: none;
+    border-bottom-color: var(--color-text-accent);
+}
+
+.gs-state-controls {
+    display: flex;
+    gap: 2px;
+}
+
+.gs-state-btn {
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    font-size: 0.7rem;
+    padding: 0 3px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.gs-state-btn:hover {
+    color: var(--color-text-accent);
+    background: none;
+}
+
+.gs-state-body {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.gs-state-on-enter {
+    font-size: 0.65rem;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    padding: 2px 4px;
+    border: 1px dashed rgba(255,255,255,0.1);
+}
+
+.gs-state-on-enter:hover {
+    border-color: var(--color-text-accent);
+    color: var(--color-text-accent);
+}
+
+/* Connection ports */
+.gs-port-out {
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    background: var(--color-border);
+    border: 2px solid #000;
+    border-radius: 50%;
+    cursor: crosshair;
+    z-index: 10;
+    transition: background 0.1s;
+}
+
+.gs-port-out:hover {
+    background: var(--color-text-accent);
+}
+
+.gs-port-out.active {
+    background: var(--color-text-accent);
+    box-shadow: 0 0 6px var(--color-text-accent);
+}
+
+/* ── SVG arrows ── */
+.gs-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.gs-transition-arrow {
+    fill: none;
+    stroke: var(--color-border);
+    stroke-width: 2;
+    pointer-events: stroke;
+    cursor: pointer;
+    transition: stroke 0.1s;
+}
+
+.gs-transition-arrow:hover {
+    stroke: var(--color-text-accent);
+}
+
+.gs-arrow-head {
+    fill: var(--color-border);
+    pointer-events: none;
+}
+
+.gs-transition-label {
+    fill: var(--color-text-secondary);
+    font-family: var(--font-family);
+    font-size: 0.6rem;
+    pointer-events: none;
+}
+
+/* ── Transition editor panel ── */
+.gs-transition-editor {
+    position: absolute;
+    background: var(--color-bg-secondary);
+    border: var(--border-width) solid var(--color-border);
+    padding: var(--spacing-sm);
+    min-width: 220px;
+    z-index: 50;
+    font-size: var(--font-size-small);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+}
+
+.gs-transition-editor h4 {
+    color: var(--color-text-accent);
+    font-size: var(--font-size-small);
+    text-transform: uppercase;
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    justify-content: space-between;
+}
+
+.gs-condition-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-bottom: 4px;
+}
+
+.gs-condition-input {
+    flex: 1;
+    padding: 2px var(--spacing-xs);
+    font-family: var(--font-family);
+    font-size: var(--font-size-small);
+    background: var(--color-text-light);
+    border: var(--border-width-thin) solid var(--color-border);
+    color: var(--color-text-primary);
+}
+
+.gs-condition-del {
+    color: var(--color-text-error);
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0 2px;
+}
+
+/* Initial state badge */
+.initial-badge {
+    font-size: 0.55rem;
+    background: var(--color-text-accent);
+    color: #000;
+    padding: 1px 4px;
+    font-weight: bold;
+    margin-left: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0;
+}
