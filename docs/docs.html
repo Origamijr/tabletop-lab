@@ -5,22 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Documentation - Tabletop Lab</title>
     <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="nav.css">
     <link rel="stylesheet" href="docs.css">
     <script src="utils.js"></script>
+    <script src="nav.js"></script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="../index.html" class="nav-brand">Tabletop Lab</a>
-            <ul class="nav-menu">
-                <li><a href="../index.html" class="nav-link">Play</a></li>
-                <li><a href="about.html" class="nav-link">About</a></li>
-                <li><a href="../tabletoplab/editor/editor.html" class="nav-link">Create</a></li>
-                <li><a href="docs.html" class="nav-link active">Docs</a></li>
-            </ul>
-        </div>
-    </nav>
+    <div id="navbar"></div>
 
     <div class="docs-container">
         <aside class="docs-sidebar">
@@ -37,6 +27,8 @@
     </div>
 
     <script>
+        document.getElementById('navbar').innerHTML = createNavbar('Docs');
+        
         const docsPath = '.';
         
         // Folder structure with markdown files

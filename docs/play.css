@@ -1,0 +1,191 @@
+
+.section {
+    margin-bottom: var(--spacing-lg);
+}
+
+.section h2 {
+    font-size: var(--font-size-subtitle);
+    color: var(--color-text-accent);
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    border-bottom: var(--border-width-thin) solid var(--color-border);
+    padding-bottom: var(--spacing-xs);
+}
+
+.repo-input {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.repo-input input {
+    flex: 1;
+    padding: var(--spacing-sm);
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-text-light);
+    color: var(--color-text-primary);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+}
+
+.repo-input input::placeholder {
+    color: var(--color-placeholder);
+}
+
+.repo-input button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-border);
+    color: var(--color-text-primary);
+    border: var(--border-width) solid var(--color-border);
+    cursor: pointer;
+    font-size: var(--font-size-base);
+    font-family: var(--font-family);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.repo-input button:hover {
+    background: var(--color-text-accent);
+    border-color: var(--color-text-accent);
+}
+
+.search-input {
+    width: 100%;
+    flex: 1;
+    padding: var(--spacing-sm);
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-text-light);
+    color: var(--color-text-primary);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+}
+
+.search-input::placeholder {
+    color: var(--color-placeholder);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--color-text-accent);
+}
+
+.btn {
+    padding: 0.35rem 0.75rem;
+    border: var(--border-width) solid;
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    font-family: var(--font-family);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.btn {
+    background: var(--color-btn-primary);
+    color: var(--color-btn-primary-text);
+    border-color: var(--color-btn-primary);
+}
+
+.btn:hover {
+    background: var(--color-text-accent);
+    border-color: var(--color-text-accent);
+    color: var(--color-btn-primary-text);
+}
+
+.btn:disabled {
+    background: #444444;
+    color: #222222;
+    border-color: #444444;
+    cursor: not-allowed;
+}
+
+.games-list {
+    display: grid;
+    gap: var(--spacing-xs);
+}
+
+.game-card {
+    border: var(--border-width) solid var(--color-border);
+    padding: var(--spacing-sm);
+    background: var(--color-bg-tertiary);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    overflow: hidden;
+    flex-wrap: nowrap;
+    min-height: 30px;
+}
+
+.game-card:hover {
+    background: var(--color-bg-hover);
+}
+
+.game-card-content {
+    transition: max-height 0.2s ease-in-out;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.game-card-content:not(.expanded) {
+    max-height: 30px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.game-card-content.expanded {
+    max-height: 500px;
+    white-space: normal;
+    overflow: visible;
+}
+
+.game-header {
+    margin: 0;
+}
+
+.game-header h3 {
+    font-size: var(--font-size-card);
+    color: var(--color-text-accent);
+    margin: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.game-toggle {
+    font-size: 1.2rem;
+    color: var(--color-text-secondary);
+    flex-shrink: 0;
+    font-weight: bold;
+    padding: 0 var(--spacing-xs);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.game-description {
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+    margin-top: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.3;
+}
+
+.game-actions {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+    .game-actions {
+        flex-direction: column;
+    }
+}
+
