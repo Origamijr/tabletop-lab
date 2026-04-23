@@ -105,17 +105,17 @@
             }
 
             try {
-                const response = await fetch(`games/${gameName}/ui.json`);
+                const response = await fetch(`games/${gameName}/game.json`);
                 if (response.ok) {
                     const data = await response.json();
                     gameDataCache[gameName] = data;
                     return data;
                 }
             } catch (error) {
-                console.log(`No ui.json for ${gameName}`);
+                console.log(`No game.json for ${gameName}`);
             }
 
-            gameDataCache[gameName] = { name: gameName };
+            gameDataCache[gameName] = { gamename: gameName };
             return gameDataCache[gameName];
         }
 
@@ -148,7 +148,7 @@
 
                 const gameData = await loadGameData(gameName);
                 const description = gameData.description || 'No description available';
-                const displayName = gameData.name || gameName;
+                const displayName = gameData.gamename || gameName;
 
                 cardContent.innerHTML = `
                     <div class="game-header">
@@ -190,7 +190,7 @@
                 filtered = [];
                 for (const game of loadedGames) {
                     const gameData = await loadGameData(game);
-                    const displayName = gameData.name || game;
+                    const displayName = gameData.gamename || game;
                     const description = gameData.description || '';
                     const searchText = `${displayName} ${description}`;
 

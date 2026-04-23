@@ -1,6 +1,7 @@
 local Zone = require('tabletoplab.lua.Zone')
 local Object = require('tabletoplab.lua.Object')
 local Action = require('tabletoplab.lua.Action')
+local ObjectScript = require('tabletoplab.lua.ObjectScript')
 local utils = require('tabletoplab.lua.utils')
 
 -- SINGLETON CLASS
@@ -44,14 +45,39 @@ function Game:initialize(initConfig)
             end
         end
     end
+    
+    -- Object tracking and handlers
+    -- _objects_by_id: Map from object UID to Object instance for fast lookup
+    self._objects_by_id = {}
+    
+    -- _object_handlers: Map from script_name -> {compiled handlers, initialize fn, etc}
+    -- Handlers are stored externally and persist across game state loads
+    self._object_handlers = {}
+    
+    -- _object_scripts: Map from object_id -> script_name for script lookup
+    -- This allows querying which scripts apply to an object
+    self._object_scripts = {}
 
     -- default variables in scope of scripts
-    self.env = setmetatable(setmetatable({
+    -- Use metatables to ensure variable reads/writes go through self.variables
+    -- Reads: check variables first, then globals
+    -- Writes: always update self.variables
+    self.env = setmetatable({
         zones=self.zones,
         state=self.state,
         signaled=self.signaled,
         load_collection=function(...) return self:load_collection(...) end
-    }, {__index=self.variables}), {__index=_G})
+    }, {
+        __index = function(t, k)
+            if self.variables[k] ~= nil then
+                return self.variables[k]
+            end
+            return _G[k]
+        end,
+        __newindex = function(t, k, v)
+            self.variables[k] = v
+        end
+    })
 
     -- run initialization scripts (if any)
     self:log('Initializing...')
@@ -90,7 +116,7 @@ function Game:initialize(initConfig)
             if not t.conditions then goto continue end
             cfg._cond_fns = {}
             for ii, cond in ipairs(t.conditions) do
-                table.insert(cfg._cond_fn, self:createScriptFn(
+                table.insert(cfg._cond_fns, self:createScriptFn(
                     cond, 
                     "state_"..name.."_tran"..i.."_cond"..ii,
                     "return %s"
@@ -101,6 +127,122 @@ function Game:initialize(initConfig)
     end
 
     return self
+end
+
+-- ============================================================================
+-- OBJECT AND HANDLER METHODS
+-- ============================================================================
+
+-- Game:get_object(obj_id): Get an object by its UID
+-- @param obj_id (number): The UID of the object
+-- @return Object: The object instance, or nil if not found
+function Game:get_object(obj_id)
+    return self._objects_by_id[obj_id]
+end
+
+-- Game:get_zone_by_uid(zone_uid): Get a zone by its UID
+-- @param zone_uid (number): The UID of the zone
+-- @return Zone: The zone instance, or nil if not found
+function Game:get_zone_by_uid(zone_uid)
+    return self._id2zone[zone_uid]
+end
+
+-- Game:register_object_handlers(script_name, obj_id, compiled_handlers): Register handlers for an object
+-- @param script_name (string): Name/ID of the script (e.g., 'card_2', 'spell_effect')
+-- @param obj_id (number): UID of the object
+-- @param compiled_handlers (table): Compiled handler table from ObjectScript:build()
+--
+-- The compiled_handlers should contain:
+--   - handlers: {handler_name = check_fn}
+--   - conditions: {handler_name = {condition_fn_1, condition_fn_2, ...}}
+--   - actions: {handler_name = {action_fn_1, action_fn_2, ...}}
+--   - initialize: optional function (game, obj_id)
+function Game:register_object_handlers(script_name, obj_id, compiled_handlers)
+    -- Store the compiled handlers by script name
+    if not self._object_handlers[script_name] then
+        self._object_handlers[script_name] = compiled_handlers
+    end
+    
+    -- Mark this script as applicable to this object
+    if not self._object_scripts[obj_id] then
+        self._object_scripts[obj_id] = {}
+    end
+    self._object_scripts[obj_id][script_name] = true
+    
+    -- Call the initialize function if present (only on first registration)
+    local obj = self:get_object(obj_id)
+    if obj and compiled_handlers.initialize then
+        compiled_handlers.initialize(self, obj_id)
+    end
+end
+
+-- Game:check_object_conditions(obj_id, handler_name): Check if all conditions for a handler are met
+-- @param obj_id (number): UID of the object
+-- @param handler_name (string): Name of the handler to check
+-- @return boolean: True if all conditions are met, false otherwise
+function Game:check_object_conditions(obj_id, script_name, handler_name)
+    local handlers = self._object_handlers[script_name]
+    if not handlers or not handlers.conditions[handler_name] then
+        return false
+    end
+    
+    -- Check all conditions for this handler
+    for _, cond in ipairs(handlers.conditions[handler_name]) do
+        if not cond(self, obj_id) then
+            return false
+        end
+    end
+    
+    return true
+end
+
+-- Game:execute_object_action(obj_id, handler_name): Execute all actions for a handler
+-- @param obj_id (number): UID of the object
+-- @param script_name (string): Name of the script
+-- @param handler_name (string): Name of the handler to execute
+function Game:execute_object_action(obj_id, script_name, handler_name)
+    local handlers = self._object_handlers[script_name]
+    if not handlers or not handlers.actions[handler_name] then
+        return
+    end
+    
+    -- Execute all actions for this handler in sequence
+    for _, action in ipairs(handlers.actions[handler_name]) do
+        action(self, obj_id)
+    end
+end
+
+-- Game:emit_event(event_name, event_data): Emit an event that handlers can listen for
+-- @param event_name (string): Name of the event
+-- @param event_data (table): Event data to pass to listeners
+--
+-- Note: This is a stub for a future event listener system
+function Game:emit_event(event_name, event_data)
+    self:log(string.format("Event emitted: %s", event_name), 
+             {event="EMIT_EVENT", event_name=event_name, data=event_data})
+    -- TODO: Implement event listener dispatch if needed
+end
+
+function Game:set_signal(signal_values)
+    -- Handles both single and multiple return values from scripts
+    -- Sets self.signaled[signal_name] = true for each signal
+    if not signal_values then return end
+    
+    -- Handle single signal (string)
+    if type(signal_values) == 'string' then
+        self.signaled[signal_values] = true
+        return
+    end
+    
+    -- Handle table of signals (for when multiple signals need to be set)
+    if type(signal_values) == 'table' then
+        for _, signal in ipairs(signal_values) do
+            if signal then
+                self.signaled[signal] = true
+            end
+        end
+        return
+    end
 end
 
 function Game:parseAction(action_name, action_cfg)
@@ -163,11 +305,10 @@ function Game:step()
             self.state[state_name] = true
             
             local state_cfg = self.fsm[state_name]
-            local signal = nil
             if state_cfg and state_cfg._enter_fn then
-                signal = self.state_cfg._enter_fn()
+                local signal = state_cfg._enter_fn()
+                self:set_signal(signal)
             end
-            if signal then do self.signaled[signal] = true end end
         end
         
         -- Check transitions for each active state
@@ -218,31 +359,170 @@ function Game:applyAction(actions)
     return self
 end
 
+-- Game:getActions(player): Get all available actions for a player
+-- @param player (any): Player identifier/object
+-- @return table: List of available actions from both FSM actions and object handlers
+--
+-- Probes all object handlers to find actions triggered by current game state.
+-- Returns both traditional Action objects and handler-based actions.
 function Game:getActions(player)
     local valid_actions = {}
+    
+    -- Add actions from the FSM action system
     for action_name, action in pairs(self.actions) do
         if action:check_conditions(player) then
             table.insert(valid_actions, { name = action_name, action = action })
         end
     end
+    
+    -- Add actions from object handlers
+    for obj_id, scripts in pairs(self._object_scripts) do
+        for script_name, _ in pairs(scripts) do
+            local handlers = self._object_handlers[script_name]
+            if handlers then
+                for handler_name, _ in pairs(handlers.handlers) do
+                    -- Check if conditions are met for this handler
+                    if self:check_object_conditions(obj_id, script_name, handler_name) then
+                        table.insert(valid_actions, {
+                            name = handler_name,
+                            type = 'handler',
+                            obj_id = obj_id,
+                            script_name = script_name,
+                            handler_name = handler_name,
+                        })
+                    end
+                end
+            end
+        end
+    end
+    
     return valid_actions
 end
 
+-- Game:getState(flag): Serialize game state for saving, tree search, or checkpoints
+-- @param flag (string or any): Optional flag for visibility filtering (e.g., player ID for hidden info)
+-- @return table: Serializable game state containing objects, zones, variables, FSM state
+--
+-- State is JSON-serializable and contains:
+--   - variables: Game variables (rules state, round number, etc.)
+--   - state: Current FSM states
+--   - objects: All objects with their properties and zone assignments
+--   - zones: Zone state
+--
+-- Note: Object handlers are NOT serialized (stored in Game instance).
+-- Objects are reconstructed with their game reference on loadState.
 function Game:getState(flag)
-    -- stub implementation, should be a proper encoding based on flag (typically flag is player to ensure hidden knowledge isn't encoded in state)
-    -- Ideally, the state should be completely described by
-        -- placement of objects in zones
-        -- instance variable state in objects
-        -- gamestate.state
-        -- gamestate.variables
-    return self 
+    local state = {
+        variables = {},
+        state = {},
+        objects = {},
+        zones = {},
+    }
+    
+    -- Copy variables (should be JSON-serializable)
+    for k, v in pairs(self.variables) do
+        state.variables[k] = v
+    end
+    
+    -- Copy current FSM states
+    for state_name, is_active in pairs(self.state) do
+        if is_active then
+            table.insert(state.state, state_name)
+        end
+    end
+    
+    -- Serialize all objects
+    -- Include only serializable properties (not _game_ref, not functions)
+    for obj_id, obj in pairs(self._objects_by_id) do
+        local obj_state = {}
+        
+        -- Copy all properties except internal system fields
+        for k, v in pairs(obj) do
+            if k:match("^_game_ref") then
+                -- Skip game reference (will be re-assigned on load)
+                goto skip_field
+            end
+            
+            -- Skip functions
+            if type(v) == 'function' then
+                goto skip_field
+            end
+            
+            -- Copy state properties
+            obj_state[k] = v
+            
+            ::skip_field::
+        end
+        
+        state.objects[obj_id] = obj_state
+    end
+    
+    -- Store zone state (just the zone names/UIDs for reference)
+    for zone_name, zone_or_zones in pairs(self.zones) do
+        state.zones[zone_name] = {
+            uid = zone_or_zones._uid or (zone_or_zones[1] and zone_or_zones[1]._uid),
+        }
+    end
+    
+    return state
 end
 
+-- Game:loadState(state): Restore game state from a serialized state
+-- @param state (table): State table from getState()
+-- @return self: Returns self for chaining
+--
+-- Reconstruction process:
+-- 1. Restore variables, FSM states
+-- 2. Recreate object instances with properties from saved state
+-- 3. Re-assign game references to objects
+-- 4. Do NOT re-execute scripts (handlers persist in Game instance)
+-- 5. Objects are now ready to be acted upon with handlers
 function Game:loadState(state)
-    -- stub implementation for now
-    -- If the assumptions above are true, this should effective implement rollback and save states
+    if not state then return self end
+    
+    -- Restore variables
+    for k, v in pairs(state.variables or {}) do
+        self.variables[k] = v
+    end
+    
+    -- Restore FSM states
+    self.state = {}
+    for _, state_name in ipairs(state.state or {}) do
+        self.state[state_name] = true
+    end
+    
+    -- Recreate objects
+    self._objects_by_id = {}
+    for obj_id, obj_state in pairs(state.objects or {}) do
+        -- Create a new object with the saved state
+        local obj = Object:new(obj_state)
+        
+        -- Re-assign the game reference (not serialized)
+        obj._game_ref = self
+        
+        -- Store in object map
+        self._objects_by_id[obj_id] = obj
+    end
+    
+    -- Rebuild zone object lists based on object zone assignments
+    for zone_uid, zone in pairs(self._id2zone) do
+        zone.objs = {}  -- Clear and rebuild
+    end
+    
+    for obj_id, obj in pairs(self._objects_by_id) do
+        if obj._current_zone_uid then
+            local zone = self._id2zone[obj._current_zone_uid]
+            if zone then
+                zone.objs = zone.objs or {}
+                table.insert(zone.objs, obj_id)
+            end
+        end
+    end
+    
     return self
 end
+
+
 
 function Game:log(message, data)
     local log_event = {message=message, data=data or {}}
@@ -251,15 +531,29 @@ function Game:log(message, data)
 end
 
 function Game:load_collection(zone, collection, class, base_params, script_label, quant_label)
+    -- Load objects from a collection and register their handlers
+    --
+    -- Parameters:
+    --   zone: Zone to load objects into
+    --   collection: Name of the collection (from COLLECTIONS global)
+    --   class: Object class to instantiate (default: Object)
+    --   base_params: Base parameters to apply to all objects
+    --   script_label: CSV column name for script identifier (default: "_script")
+    --   quant_label: CSV column name for quantity (default: "_quantity")
+    --
+    -- The script_label column should contain the script name/ID that identifies
+    -- which ObjectScript handlers apply to this object. The script is loaded
+    -- once globally and handlers are registered per-object.
+    
     class = class or Object
     quant_label = quant_label or "_quantity"
     script_label = script_label or "_script"
     base_params = base_params or {}
     
-    self:log(string.format('Loading %s to %s', collection, zone:get_name()), {TODO=nil})
+    self:log(string.format('Loading %s to %s', collection, zone:get_name()), {event='LOAD_COLLECTION'})
     
     if not COLLECTIONS[collection] then
-        self:log(string.format('ERROR: COLLECTIONS[%s] not found', collection), {TODO=nil})
+        self:log(string.format('ERROR: COLLECTIONS[%s] not found', collection), {error=true})
         return self
     end
 
@@ -270,6 +564,8 @@ function Game:load_collection(zone, collection, class, base_params, script_label
 
         local quant = 1
         local script_key = nil
+        
+        -- Extract special columns (_script, _quantity, etc.)
         for k, v in pairs(params) do
             if k:match("^_") then  -- skip columns starting with underscore
                 params[k] = nil
@@ -284,26 +580,63 @@ function Game:load_collection(zone, collection, class, base_params, script_label
                 script_key = v
             end
         end    
+        
+        -- Create object instances
         for _ = 1, quant do
             local obj = class:new(params)
-            obj:set_zone(zone, true)
-            -- If there is a script_key, load and execute the lazy script
+            
+            -- Store object in game's object map
+            self._objects_by_id[obj._uid] = obj
+            
+            -- Set zone by UID
+            obj:set_zone(zone._uid, zone, true)
+            
+            -- Add object to zone's object list
+            zone.objs = zone.objs or {}
+            table.insert(zone.objs, obj._uid)
+            
+            -- Give object a reference to the game (not serialized)
+            obj._game_ref = self
+            
+            -- If there is a script_key, load the ObjectScript and register handlers
             if script_key then
-                local lazy_script = LOAD_OBJECT_SCRIPT(script_key)
-                local env = setmetatable({ GetObj = function() return obj, zone, self.game end }, { __index = _G })
-                local chunk, load_err = load(lazy_script, script_key, 't', env)
-                if not chunk then
-                    error("Failed to load object script '" .. script_key .. "': " .. load_err)
-                end
-                local ok, run_err = pcall(chunk)
-                if not ok then
-                    error("Failed to execute object script '" .. script_key .. "': " .. run_err)
+                local script_obj = self:_load_object_script(script_key)
+                if script_obj then
+                    -- Mark the script as applicable to this object
+                    obj:mark_script_applicable(script_key, true)
+                    
+                    -- Build and register handlers for this object
+                    local compiled_handlers = script_obj:build(obj._uid, self)
+                    self:register_object_handlers(script_key, obj._uid, compiled_handlers)
                 end
             end
         end
     end
     
     return zone
+end
+
+-- Game:_load_object_script(script_key): Load an ObjectScript from file/cache
+-- @param script_key (string): Identifier for the script to load
+-- @return ObjectScript or nil: The loaded ObjectScript instance, or nil if not found
+--
+-- This is a helper that loads the script file and instantiates an ObjectScript.
+-- In practice, script files should call ObjectScript:new() and set up handlers.
+-- This method handles caching to avoid reloading the same script multiple times.
+function Game:_load_object_script(script_key)
+    -- TODO: Implement script caching and loading
+    -- For now, this is a stub that assumes scripts are pre-loaded
+    -- In a real implementation, this would:
+    -- 1. Check if script is already loaded (cache)
+    -- 2. Load from file: LOAD_OBJECT_SCRIPT(script_key)
+    -- 3. Execute in a controlled environment
+    -- 4. Return the instantiated ObjectScript
+    -- 5. Cache for future use
+    
+    self:log(string.format('Loading script: %s', script_key), {event='LOAD_SCRIPT'})
+    
+    -- Placeholder: should return an ObjectScript instance
+    return nil
 end
 
 function Game:createScriptFn(scripts, chunk_name, line_format, env)

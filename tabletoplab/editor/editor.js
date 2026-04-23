@@ -84,7 +84,6 @@ class Editor {
     saveToStorage() {
         try {
             sessionStorage.setItem('tl_game',    JSON.stringify(window.gameConfig.exportGame()));
-            sessionStorage.setItem('tl_ui',      JSON.stringify(window.gameConfig.exportUI()));
             sessionStorage.setItem('tl_scripts', JSON.stringify(window.gameConfig._scripts || []));
             sessionStorage.setItem('tl_fsmlayout', JSON.stringify(window.gameConfig.ui._fsmLayout || {}));
         } catch(e) {
@@ -96,11 +95,9 @@ class Editor {
     _loadFromStorage() {
         try {
             const game      = sessionStorage.getItem('tl_game');
-            const ui        = sessionStorage.getItem('tl_ui');
             const scripts   = sessionStorage.getItem('tl_scripts');
             const fsmLayout = sessionStorage.getItem('tl_fsmlayout');
             if (game)      window.gameConfig.importGame(JSON.parse(game));
-            if (ui)        window.gameConfig.importUI(JSON.parse(ui));
             if (scripts)   window.gameConfig._scripts = JSON.parse(scripts);
             if (fsmLayout) window.gameConfig.ui._fsmLayout = JSON.parse(fsmLayout);
         } catch(e) {
@@ -131,15 +128,10 @@ class Editor {
         try {
             const zip = await new JSZip().loadAsync(zipFile);
 
-            // game.json
+            // game.json (contains all metadata now)
             if (zip.file('game.json')) {
                 const txt = await zip.file('game.json').async('text');
                 window.gameConfig.importGame(JSON.parse(txt));
-            }
-            // ui.json
-            if (zip.file('ui.json')) {
-                const txt = await zip.file('ui.json').async('text');
-                window.gameConfig.importUI(JSON.parse(txt));
             }
             // scripts.json
             if (zip.file('scripts.json')) {
@@ -210,10 +202,9 @@ class Editor {
         }
 
         const zip = new JSZip();
-        const gameName = (window.gameConfig.ui.gamename || 'game').replace(/\s+/g, '_');
+        const gameName = (window.gameConfig.game.gamename || 'game').replace(/\s+/g, '_');
 
         zip.file('game.json', JSON.stringify(window.gameConfig.exportGame(), null, 2));
-        zip.file('ui.json',   JSON.stringify(window.gameConfig.exportUI(),   null, 2));
         if (window.gameConfig._scripts && window.gameConfig._scripts.length) {
             zip.file('scripts.json', JSON.stringify(window.gameConfig._scripts, null, 2));
         }

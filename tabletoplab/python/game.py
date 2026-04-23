@@ -96,9 +96,6 @@ class TTLGame():
         self.game = self.lua.globals().GAME
         self.lua.globals().GAME['initialize'](self.game, self.lua.table_from(self.game_config, recursive=True))
 
-    def initialize(self):
-        self.env = self.lua.eval
-
     def parse_csv_sanitized(self, path):
         with open(path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)

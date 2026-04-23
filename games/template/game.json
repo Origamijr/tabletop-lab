@@ -1,8 +1,18 @@
 {
+    "gamename": "Template",
+    "description": "Menu description goes here",
+    "rules": "Rules go here",
     "players": 2,
     "zones": {
-        "deck": {"quantity": 1},
-        "hand": {"quantity": 2}
+        "deck": {
+            "visibility": false,
+            "display_mode": "stack"
+        },
+        "hand": {
+            "quantity": 2,
+            "visibility": "player",
+            "display_mode": "spread-x"
+        }
     },
     "variables": {
         "var": "-- set on init",
@@ -10,7 +20,8 @@
     },
     "init": [ 
         "-- scripts to call on initialization",
-        "zones.deck:load_collection('collection', Card, {}):shuffle()"
+        "load_collection(deck, 'collection', Card, {})",
+        "deck:shuffle()"
     ],
     "gamestates": {
         "deal": {
@@ -18,7 +29,7 @@
             "on_enter": [
                 "-- scripts to run on entering state",
                 "zones.deck:deal(zones.hand[1], 5)",
-                "return 'this_wont_happen'"
+                "return 'this_wont_happen', 'a_second_signal"
             ],
             "transitions": [
                 {"conditions": ["#zones.hand[1]<5","false"], "next_state": ["this_wont_happen","nondeterministic_transition"]},

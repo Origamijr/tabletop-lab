@@ -7,8 +7,11 @@
 
 class GameConfig {
     constructor() {
-        // ── game.json fields ──
+        // ── game.json fields (including metadata) ──
         this.game = {
+            gamename: '',
+            description: '',
+            rules: '',
             players: 2,
             zones: {},       // { name: { quantity, visibility, display_mode } }
             variables: {},   // { name: value }
@@ -18,11 +21,8 @@ class GameConfig {
             collections: {}  // { name: { csv: { headers[], rows[][] } } }
         };
 
-        // ── ui.json fields ──
+        // ── ui.json fields (layout only) ──
         this.ui = {
-            gamename: '',
-            description: '',
-            rules: '',
             gridSize: { w: 63, h: 88 }, // default: poker card size in px at 96dpi
             layout: {},          // { zoneName: { x,y,w,h, indexing:'absolute'|'relative', instances:[{x,y}] } }
             collectionLayouts: {} // { collName: { gridW, gridH, elements:[{x,y,w,h,source,type}] } }
@@ -41,6 +41,7 @@ class GameConfig {
 
     importGame(data) {
         this.game = Object.assign({
+            gamename: '', description: '', rules: '',
             players: 2, zones: {}, variables: {}, init: [],
             gamestates: {}, actions: {}, collections: {}
         }, data);
@@ -48,7 +49,6 @@ class GameConfig {
 
     importUI(data) {
         this.ui = Object.assign({
-            gamename: '', description: '', rules: '',
             gridSize: { w: 63, h: 88 },
             layout: {}, collectionLayouts: {}
         }, data);
@@ -92,26 +92,26 @@ class GameConfig {
     setCollectionLayout(n, cfg) { this.ui.collectionLayouts[n] = cfg; }
     deleteCollectionLayout(n)   { delete this.ui.collectionLayouts[n]; }
 
-    getMeta()              { return { gamename: this.ui.gamename, description: this.ui.description, rules: this.ui.rules }; }
+    getMeta()              { return { gamename: this.game.gamename, description: this.game.description, rules: this.game.rules }; }
     setMeta(name, desc, rules) {
-        this.ui.gamename = name;
-        this.ui.description = desc;
-        this.ui.rules = rules;
+        this.game.gamename = name;
+        this.game.description = desc;
+        this.game.rules = rules;
     }
 
     getMetadata() {
         return {
-            name: this.ui.gamename,
-            description: this.ui.description,
-            rules: this.ui.rules,
+            name: this.game.gamename,
+            description: this.game.description,
+            rules: this.game.rules,
             players: this.game.players
         };
     }
 
     setMetadata(data) {
-        if (data.name !== undefined) this.ui.gamename = data.name;
-        if (data.description !== undefined) this.ui.description = data.description;
-        if (data.rules !== undefined) this.ui.rules = data.rules;
+        if (data.name !== undefined) this.game.gamename = data.name;
+        if (data.description !== undefined) this.game.description = data.description;
+        if (data.rules !== undefined) this.game.rules = data.rules;
         if (data.players !== undefined) this.game.players = data.players;
     }
 }
