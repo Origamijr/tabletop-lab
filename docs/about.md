@@ -7,6 +7,7 @@ The intended users for this web client are analog game designers that want any o
 - A quick-start framework for a prototype-level digital implementation
 - An easily distributable platform for facilitating playtesting
 - Tools to assess game balance at scale, via human-human, human-AI, and AI-AI play
+- An interactive archive of mechanics from other games that may be difficult to explore otherwise
 
 **THIS PROJECT IS STILL UNDER DEVELOPMENT AND IS NOT READY FOR USE**. *(Ideally, a minimum viable product will be usable mid Summer 2026).* As this is mostly a for-fun side project, but the main ideas in priority are as follows:
 

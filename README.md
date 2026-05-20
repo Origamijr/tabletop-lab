@@ -9,6 +9,7 @@ The intended users for this web client are analog game designers that want any o
 - A quick-start framework for a prototype-level digital implementation
 - An easily distributable platform for facilitating playtesting
 - Tools to assess game balance at scale, via human-human, human-AI, and AI-AI play
+- An interactive archive of mechanics from other games that may be difficult to explore otherwise
 
 **THIS PROJECT IS STILL UNDER DEVELOPMENT AND IS NOT READY FOR USE**. *(Ideally, a minimum viable product will be usable mid Summer 2026).* As this is mostly a for-fun side project, but the main ideas in priority are as follows:
 
@@ -65,19 +66,38 @@ Feel free to contact me via discord (username: origamijr), or [check out the cod
 
 ## Games
 
+### Card Games
+
+Card games that can be played with a 52-card deck should hopefully require minimal implementation using this framework.
+
 | Game | Status | Notes |
 |---|---|---|
 | Cuttle | in progress | First game to implement, as its a nice middle ground complexity to bridge traditional card games and TCGs |
 | Hokm | next priority | Engine should be able to support this game without any additional scripts |
 | Cribbage | next priority | Engine should be able to support this game with only one external script to score hands |
-| pending name solitaire | eventually | just a game I made |
-| pending name htcg | eventually | another game I made |
-| pending name deduction game | eventually | yet another game I made |
-| Dominion | maybe | classic modern card game to push limits farther than cuttle |
+
+### Trading Card Games
+
+These are what I'm primarily interested in for this framework. I'll probably only try to implement a couple starter decks for each. This table is basically just the TCGs I'm interested in implementing atm, but I want to have as many as possible, as a pseudo playable TCG archive.
+
+| Game | Status | Notes |
+|---|---|---|
+| Wixoss | hopefully | rip EN, openbatoru already exists, but still gunna try |
+| Caster Chronicles | hopefully | upcoming TCG. I know a digital client is in the works, but this is mostly just to experiment |
 | [Grand Archive](https://www.gatcg.com/) | maybe | felt table exists, but I wanna have a go at it too |
-| Wixoss | maybe | rip EN, openbatoru already exists, but still gunna try |
-| [Re;Act](https://www.brotherminggames.com/react) | maybe | fun game, but no scripted client yet |
+| Vividz | maybe | Seems like an interesting win condition |
+| Build Divide | maybe | I have some cards laying around, wouldn't hurt to try learning |
+| Luck & Logic | maybe | Seems like it crashed on release, and it's rules are really complex, which can make it an interesting digital implementation |
 | Yu-gi-oh | lmao | EDOPro is already really good, but I would want to maybe push AI scripting to its limits |
+
+### Board Games
+
+Hypothetically board games should be doable via this framework as well, though "board games" in general is so broad that it's possible that the scripting I implement don't fit most genres here.
+
+| Game | Status | Notes |
+|---|---|---|
+| Dominion | maybe | classic modern card game to push limits farther than cuttle |
+| [Re;Act](https://www.brotherminggames.com/react) | maybe | fun game, but no scripted client yet |
 
 idk the legality of some of the games, but at the very least TCGs I should probably not host card images on github
 
