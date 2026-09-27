@@ -38,6 +38,9 @@ class TTLGame():
         pkg_patterns = f";{game_path_abs}/?.lua;{game_path_abs}/?/init.lua;{core_lua_dir}/?.lua;{core_lua_dir}/?/init.lua"
         self.lua.execute(f'package.path = (package.path or "") .. "{pkg_patterns}"')
 
+        # Load lambda preprocessor FIRST to enable |params| expr syntax throughout the project
+        self.lua.execute('local LambdaPreprocessor = require("lambda_preprocessor"); LambdaPreprocessor.enable_auto_transform()')
+
         # Require all core lua files from the engine's lua directory
         for lua_file in glob.glob(f"{core_lua_dir}/**/*.lua", recursive=True):
             rel = os.path.relpath(lua_file, core_lua_dir).replace("\\", "/")
@@ -107,4 +110,12 @@ class TTLGame():
                 except (json.JSONDecodeError, TypeError):
                     return v.strip()
             return [{k.strip(): parse_cell(v) for k, v in row.items()} for row in reader]
+        
+    def play(self):
+        self.game['step'](self.game)
+        while not post:
+            yield {p: self.game['getActions'](self.game, p) for p in players}
+            self.game['step'](self.game)
+            post = self.game['isEnd'](self.game)
+
 

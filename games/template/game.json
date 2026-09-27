@@ -2,16 +2,21 @@
     "gamename": "Template",
     "description": "Menu description goes here",
     "rules": "Rules go here",
-    "players": 2,
+    "players": [2,3,4],
     "zones": {
         "deck": {
             "visibility": false,
             "display_mode": "stack"
         },
         "hand": {
-            "quantity": 2,
+            "quantity": "player, but any defined invalid value works (default case)",
             "visibility": "player",
             "display_mode": "spread-x"
+        },
+        "play": {
+            "quantity": [2,5],
+            "visibility": true,
+            "display_mode": "spread-y"
         }
     },
     "variables": {

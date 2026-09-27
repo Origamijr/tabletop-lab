@@ -42,7 +42,7 @@ function Action:set_execution(exec)
 end
 
 function Action:check_conditions(player)
-    _G.player = player
+    _G.PLAYER = player
     for _, cond in pairs(self._conditions) do
         if not cond() then return false end
     end
@@ -50,7 +50,7 @@ function Action:check_conditions(player)
 end
 
 function Action:get_valid_targets(name, player, targets)
-    _G.player = player
+    _G.PLAYER = player
     if targets then for t, v in pairs(targets) do _G.t = v end end
     local spec = self._targets[name]
     if not spec then return {} end
@@ -68,7 +68,7 @@ function Action:get_valid_targets(name, player, targets)
 end
 
 function Action:execute(player, targets)
-    _G.player = player
+    _G.PLAYER = player
     if targets then for t, v in pairs(targets) do _G.t = v end end
     return self._execution()
 end

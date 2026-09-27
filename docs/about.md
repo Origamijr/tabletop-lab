@@ -1,6 +1,6 @@
 ## What is tabletop lab
 
-This is yet another board game framework along the lines of [ludii](https://ludii.games/), [RLCard](https://rlcard.org/), and [TAP](https://tabletopgames.ai/), with the general aim of creating AI to play various board games (primary interest on card games) towards easier self-feedback playtesting. 
+This is yet another board game framework along the lines of [ludii](https://ludii.games/), [RLCard](https://rlcard.org/), and [TAP](https://tabletopgames.ai/), with the general aim of creating AI to play various board games (primary interest on card games) towards easier self-feedback playtesting. From a user's perspective, it is similar to [TCG Arena](https://tcg-arena.fr/), but with a focus on scripting over ease of use (also multiplayer is not a part of this project's core philosophy).
 
 The intended users for this web client are analog game designers that want any of the following:
 

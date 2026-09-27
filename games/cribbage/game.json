@@ -4,7 +4,7 @@
     "zones": {
         "deck": {},
         "hand": {
-            "quantity": 2
+            "quantity": "any defined quantity value"
         },
         "play": {},
         "crib": {},

@@ -12,3 +12,4 @@ dist/
 externals/*
 !externals/redirect.md
 test_*/
+optiplay/
